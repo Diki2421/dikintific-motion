@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     try {
         let finalImageUrl = req.body.image_url || ""; 
 
-        // Proses Upload Otomatis ke Gudang Kie.ai
+        // Proses Upload Otomatis ke Gudang Kie.ai (Sempurna)
         if (req.body.image_data) {
             const base64Data = req.body.image_data.split(',')[1];
             const buffer = Buffer.from(base64Data, 'base64');
@@ -35,19 +35,14 @@ export default async function handler(req, res) {
 
         const targetUrl = 'https://api.kie.ai/api/v1/jobs/createTask'; 
         
-        // KITA KUNCI PAKSA DI LEVEL SERVER UNTUK VARIABEL TERHEMAT
+        // Format Payload 100% Bersih dan Diterima Mesin AI
         const kiePayload = {
-            model: "kling-2.6/motion-control", // Kunci paksa Kling 2.6
+            model: req.body.model || "kling-3.0/motion-control",
             input: {
                 prompt: req.body.prompt || "",
                 input_urls: [finalImageUrl], 
-                video_urls: req.body.video_url ? [req.body.video_url] : [],
-                
-                // Kita kirim semua jenis variasi kata kunci resolusi 
-                // biar server Kie.ai wajib membaca salah satunya!
-                mode: "480p",
-                resolution: "480p",
-                quality: "480p"
+                video_urls: req.body.video_url ? [req.body.video_url] : []
+                // Kita hapus parameter 480p paksaan agar server Kie.ai tidak crash
             }
         };
 
