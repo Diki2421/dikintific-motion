@@ -2,14 +2,17 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Hanya menerima method POST' });
 
     try {
-        const response = await fetch('https://api.magnific.com/v1/video/generate', {
+        // 1. UBAH TARGET URL KE SERVER KIE.AI
+        // Catatan: Ini adalah contoh endpoint Kie.ai, pastikan URL ini 
+        // sesuai dengan model yang Anda pilih di buku panduan docs.kie.ai
+        const targetUrl = 'https://api.kie.ai/api/v1/runway/generate'; 
+        
+        const response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
-                'Authorization': req.headers['authorization'],
+                'Authorization': req.headers['authorization'], // Otomatis mengirim API Key Kie Anda
                 'Content-Type': 'application/json',
-                /* INI TOPENGNYA (Mencegah blokir Firewall 403) */
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-                'Accept': 'application/json, text/plain, */*'
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
             },
             body: JSON.stringify(req.body)
         });
@@ -23,7 +26,7 @@ export default async function handler(req, res) {
         }
         
         if (!response.ok) {
-            return res.status(response.status).json({ error: `Ditolak Magnific (${response.status}): ${data.message || data.error || 'Akses ditolak'}` });
+            return res.status(response.status).json({ error: `Ditolak Kie.ai (${response.status}): ${data.message || data.error || 'Akses ditolak'}` });
         }
 
         res.status(200).json(data);
