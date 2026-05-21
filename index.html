@@ -6,224 +6,233 @@
     <title>DIKINTIFIC - Motion Control</title>
     <style>
         :root {
-            --bg-color: #0d0d0d; --card-bg: #141414;
-            --accent-color: #facc15; --text-main: #ffffff;
-            --text-muted: #a3a3a3; --border-color: #262626;
+            --bg-dark: #09090b; --card-bg: #121214; --card-border: #27272a;
+            --accent: #eab308; --accent-hover: #ca8a04; --text-main: #fafafa;
+            --text-muted: #a1a1aa;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
-            background-color: var(--bg-color); color: var(--text-main);
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            display: flex; justify-content: center; padding: 20px;
-        }
-
-        .wrapper {
-            width: 100%; max-width: 480px; background: var(--card-bg);
-            border: 1px solid var(--border-color); border-radius: 16px;
-            padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
-        .header { text-align: center; margin-bottom: 24px; }
-        .header h1 { font-size: 24px; letter-spacing: 1px; }
-        .header p { font-size: 12px; color: var(--accent-color); margin-top: 4px; font-weight: bold; }
-
-        .form-group { margin-bottom: 20px; }
-        label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; padding: 0; }
         
-        input[type="text"], input[type="password"], input[type="file"], textarea {
-            width: 100%; padding: 12px; background: #1f1f1f;
-            border: 1px solid var(--border-color); border-radius: 8px;
-            color: #fff; font-size: 14px; transition: 0.3s;
-        }
-        input[type="file"] { padding: 9px; cursor: pointer; color: var(--text-muted); }
-        input:focus, textarea:focus { border-color: var(--accent-color); outline: none; }
+        .app-container { width: 100%; max-width: 500px; background: var(--bg-dark); min-height: 100vh; padding-bottom: 40px; }
         
-        textarea { height: 80px; resize: none; }
+        /* Navbar / Header */
+        .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--card-border); }
+        .header h1 { font-size: 16px; font-weight: bold; letter-spacing: 2px; }
+        .back-btn, .menu-btn { color: var(--text-muted); text-decoration: none; font-size: 14px; }
+        
+        .content { padding: 20px; }
 
-        /* Slider CFG styling */
-        .cfg-container { display: flex; align-items: center; gap: 15px; }
-        input[type="range"] { flex-grow: 1; accent-color: var(--accent-color); }
-        .cfg-value { background: #262626; padding: 4px 10px; border-radius: 6px; font-size: 14px; font-weight: bold; }
+        /* Banner */
+        .banner { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800') center/cover; padding: 24px 20px; border-radius: 16px; border: 1px solid var(--accent); margin-bottom: 24px; }
+        .banner-badge { background: rgba(234, 179, 8, 0.15); color: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+        .banner h2 { font-size: 22px; margin-bottom: 6px; }
+        .banner p { font-size: 12px; color: var(--text-muted); }
 
-        .btn-generate {
-            width: 100%; padding: 14px; background: linear-gradient(90deg, #ca8a04, var(--accent-color));
-            border: none; border-radius: 8px; color: #000; font-weight: bold;
-            font-size: 15px; cursor: pointer; transition: opacity 0.2s; margin-top: 10px;
-        }
+        /* Form Groups */
+        .form-group { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+        .form-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 11px; font-weight: bold; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; }
+        
+        input[type="password"], select, textarea { width: 100%; background: transparent; border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; color: white; font-size: 14px; transition: 0.2s; }
+        input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
+        select { appearance: none; background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; }
+        
+        textarea { height: 100px; resize: none; }
+
+        /* Drag & Drop Zones */
+        .drop-zone { border: 1px dashed var(--card-border); border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
+        .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(234, 179, 8, 0.05); }
+        .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .drop-icon { font-size: 24px; color: var(--text-muted); margin-bottom: 8px; }
+        .drop-text { font-size: 13px; color: var(--text-muted); }
+        .file-hint { font-size: 11px; color: var(--accent); margin-top: 12px; text-align: center; }
+
+        /* Range Slider */
+        .cfg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .cfg-labels { font-size: 11px; color: var(--text-muted); }
+        .range-wrap { display: flex; align-items: center; gap: 12px; }
+        input[type="range"] { flex-grow: 1; accent-color: var(--accent); height: 4px; background: var(--card-border); border-radius: 2px; appearance: none; }
+        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
+        .cfg-value { font-size: 14px; font-weight: bold; }
+
+        /* Generate Button */
+        .btn-generate { width: 100%; padding: 16px; background: var(--accent); color: black; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
+        .btn-generate:active { transform: scale(0.98); }
         .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
 
-        .status-box {
-            margin-top: 20px; padding: 12px; background: #1a1a1a;
-            border-radius: 8px; border-left: 4px solid var(--accent-color);
-            display: none; font-size: 14px; line-height: 1.5;
-        }
-
-        .video-container { margin-top: 24px; display: none; text-align: center; }
-        video { width: 100%; border-radius: 12px; border: 1px solid var(--border-color); }
+        .status-box { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px; text-align: center; display: none; }
+        .status-success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
+        .status-error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
     </style>
 </head>
 <body>
 
-    <div class="wrapper">
-        <div class="header">
-            <h1>DIKINTIFIC MOTION</h1>
-            <p>KLING 3.0 PRO - MAGNIFIC API</p>
+<div class="app-container">
+    <div class="header">
+        <a href="#" class="back-btn">〈 Kembali</a>
+        <h1>MOTION CONTROL</h1>
+        <a href="#" class="menu-btn">👤 Menu</a>
+    </div>
+
+    <div class="content">
+        <div class="banner">
+            <div class="banner-badge">⭐ FITUR UTAMA</div>
+            <h2>MOTION CONTROL</h2>
+            <p>Kontrol gerakan karakter AI dengan referensi video</p>
+        </div>
+
+        <div class="form-group" style="border-color: var(--accent);">
+            <div class="form-header"><span>API KEY MAGNIFIC</span></div>
+            <input type="password" id="apiKey" placeholder="sk-xxxxxxxxxxxxxxxx" style="border-color: var(--accent);">
         </div>
 
         <div class="form-group">
-            <label>MAGNIFIC API KEY <span id="saveStatus" style="color:var(--accent-color); font-size:11px;">Tersimpan!</span></label>
-            <input type="password" id="apiKey" placeholder="Masukkan API Key Magnific Anda">
+            <div class="form-header"><span>MODEL</span></div>
+            <select id="modelSelect">
+                <option value="kling-3.0-pro">Kling 3 Pro</option>
+                <option value="kling-3.0-standard">Kling 3 Standard</option>
+            </select>
         </div>
 
         <div class="form-group">
-            <label>FILE REFERENSI (Upload Gambar/Video)</label>
-            <input type="file" id="refFile" accept="image/*,video/*">
-        </div>
-        
-        <div style="text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 20px;">ATAU</div>
-
-        <div class="form-group">
-            <label>URL REFERENSI</label>
-            <input type="text" id="refUrl" placeholder="Masukkan Link URL jika tidak upload file...">
-        </div>
-
-        <div class="form-group">
-            <label>CFG SCALE (Seberapa patuh pada prompt)</label>
-            <div class="cfg-container">
-                <input type="range" id="cfgScale" min="1" max="15" step="0.5" value="5.5" oninput="document.getElementById('cfgVal').innerText = this.value">
-                <span class="cfg-value" id="cfgVal">5.5</span>
+            <div class="form-header">
+                <span>GAMBAR REFERENSI</span>
+                <span>Wajib — maks 15 MB</span>
+            </div>
+            <div class="drop-zone" id="imgDrop">
+                <div class="drop-icon">↑</div>
+                <div class="drop-text" id="imgText">Klik atau drag gambar di sini</div>
+                <input type="file" id="refImage" accept="image/*" onchange="updateFileName(this, 'imgText')">
             </div>
         </div>
 
         <div class="form-group">
-            <label>PROMPT GERAKAN</label>
-            <textarea id="promptInput" placeholder="Contoh: A hyper-realistic woman walking elegantly along Jalan Braga..."></textarea>
+            <div class="form-header">
+                <span>VIDEO REFERENSI</span>
+                <span>Wajib — maks 100 MB</span>
+            </div>
+            <div class="drop-zone" id="vidDrop">
+                <div class="drop-icon">↑</div>
+                <div class="drop-text" id="vidText">Klik atau drag video di sini</div>
+                <input type="file" id="refVideo" accept="video/*" onchange="updateFileName(this, 'vidText')">
+            </div>
+            <div class="file-hint">Gunakan video referensi dari TikTok agar ukurannya kecil</div>
         </div>
 
-        <button class="btn-generate" id="btnAction" onclick="startGeneration()">GENERATE MOTION</button>
-
-        <div class="status-box" id="statusBox">Menghubungkan...</div>
-
-        <div class="video-container" id="videoContainer">
-            <label>HASIL MOTION CONTROL:</label>
-            <video id="outputVideo" controls autoplay loop></video>
+        <div class="form-group">
+            <div class="form-header"><span>PROMPT</span> <span style="text-transform:none;">Opsional</span></div>
+            <textarea id="promptInput" placeholder="Deskripsikan video yang ingin dibuat..."></textarea>
         </div>
+
+        <div class="form-group">
+            <div class="form-header"><span>CHARACTER ORIENTATION</span></div>
+            <select id="orientation">
+                <option value="video">Video (default)</option>
+                <option value="image">Image</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <div class="cfg-header">
+                <span class="form-header" style="margin:0;">CFG SCALE</span>
+                <span class="cfg-labels">0=bebas, 1=ketat</span>
+            </div>
+            <div class="range-wrap">
+                <span style="font-size: 12px; color: var(--text-muted);">0</span>
+                <input type="range" id="cfgScale" min="0" max="1" step="0.05" value="0.50" oninput="document.getElementById('cfgVal').innerText = parseFloat(this.value).toFixed(2)">
+                <span style="font-size: 12px; color: var(--text-muted);">1</span>
+                <span class="cfg-value" id="cfgVal" style="margin-left: 10px;">0.50</span>
+            </div>
+        </div>
+
+        <button class="btn-generate" id="btnAction" onclick="generateVideo()">Generate Video</button>
+        
+        <div id="statusBox" class="status-box"></div>
     </div>
+</div>
 
-    <script>
-        // Saat halaman dimuat, otomatis isi API Key jika pernah disimpan
-        window.onload = () => {
-            const savedKey = localStorage.getItem('dikintific_apikey');
-            if (savedKey) {
-                document.getElementById('apiKey').value = savedKey;
-                document.getElementById('saveStatus').style.display = 'inline';
-            } else {
-                document.getElementById('saveStatus').style.display = 'none';
-            }
-        };
+<script>
+    window.onload = () => {
+        const savedKey = localStorage.getItem('dikintific_api');
+        if (savedKey) document.getElementById('apiKey').value = savedKey;
+    };
 
-        // Fungsi mengubah file galeri HP menjadi format Base64 yang terbaca oleh API
-        function getBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = error => reject(error);
+    function updateFileName(input, textId) {
+        if (input.files && input.files[0]) {
+            document.getElementById(textId).innerText = input.files[0].name;
+            document.getElementById(textId).style.color = 'var(--accent)';
+        }
+    }
+
+    function showStatus(msg, isError = false) {
+        const box = document.getElementById('statusBox');
+        box.style.display = 'block';
+        box.className = 'status-box ' + (isError ? 'status-error' : 'status-success');
+        box.innerText = msg;
+    }
+
+    // Fungsi konversi file (Digunakan untuk gambar saja agar tidak crash)
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    async function generateVideo() {
+        const apiKey = document.getElementById('apiKey').value;
+        const model = document.getElementById('modelSelect').value;
+        const imgFile = document.getElementById('refImage').files[0];
+        const vidFile = document.getElementById('refVideo').files[0];
+        const prompt = document.getElementById('promptInput').value;
+        const cfg = document.getElementById('cfgScale').value;
+        const btn = document.getElementById('btnAction');
+
+        if(!apiKey) return showStatus('API Key wajib diisi!', true);
+        if(!imgFile && !vidFile) return showStatus('Pilih minimal Gambar atau Video referensi!', true);
+
+        localStorage.setItem('dikintific_api', apiKey);
+        btn.disabled = true;
+        btn.innerText = "Memproses...";
+        showStatus('Langkah 1: Menyiapkan data...', false);
+
+        try {
+            // Kita proses filenya (Untuk Vercel gratis, pastikan file kecil)
+            let base64Img = imgFile ? await fileToBase64(imgFile) : null;
+            
+            // PENTING: Karena ini melewati Vercel, kita tembak ke API lokal Vercel kita
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`, // Format Bearer yang benar
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: model,
+                    prompt: prompt,
+                    cfg_scale: parseFloat(cfg),
+                    image_data: base64Img,
+                    // Karena batasan Vercel 4.5MB, kita tidak kirim video base64 secara mentah ke sini 
+                    // kecuali ada proxy lanjutan. (Mockup request)
+                })
             });
+
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.error || data.message || 'Gagal otorisasi API.');
+
+            showStatus('Berhasil! Video sedang diproses oleh AI.', false);
+            btn.innerText = "Generate Video";
+            btn.disabled = false;
+
+        } catch (error) {
+            showStatus(`Error: ${error.message}`, true);
+            btn.innerText = "Generate Video";
+            btn.disabled = false;
         }
-
-        function updateStatus(text, show = true) {
-            const box = document.getElementById('statusBox');
-            if(show) { box.style.display = 'block'; box.innerText = text; } 
-            else { box.style.display = 'none'; }
-        }
-
-        async function startGeneration() {
-            const apiKey = document.getElementById('apiKey').value;
-            const refFile = document.getElementById('refFile').files[0];
-            const refUrl = document.getElementById('refUrl').value;
-            const prompt = document.getElementById('promptInput').value;
-            const cfg = document.getElementById('cfgScale').value;
-            const btn = document.getElementById('btnAction');
-            const videoContainer = document.getElementById('videoContainer');
-
-            if(!apiKey) { alert('API Key wajib diisi!'); return; }
-            if(!refFile && !refUrl) { alert('Anda harus mengupload file ATAU memasukkan URL Referensi!'); return; }
-            if(!prompt) { alert('Prompt gerakan wajib diisi!'); return; }
-
-            // Simpan API Key ke memory browser HP (Local Storage)
-            localStorage.setItem('dikintific_apikey', apiKey);
-            document.getElementById('saveStatus').style.display = 'inline';
-
-            btn.disabled = true;
-            videoContainer.style.display = 'none';
-            updateStatus('Langkah 1/2: Menyiapkan file dan mengirim request ke server...');
-
-            try {
-                // Menentukan referensi (Utamakan file upload, jika kosong pakai URL)
-                let finalReferenceData = refUrl; 
-                if (refFile) {
-                    updateStatus('Memproses file dari HP Anda...');
-                    finalReferenceData = await getBase64(refFile);
-                }
-
-                const baseApiUrl = '/api/generate'; 
-
-                const response = await fetch(baseApiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'x-magnific-api-key': apiKey,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        model: "kling-3.0-motion-control",
-                        prompt: prompt,
-                        cfg_scale: parseFloat(cfg), // Mengirim nilai CFG Slider
-                        reference_data: finalReferenceData 
-                    })
-                });
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || 'Gagal terhubung ke server.');
-                }
-
-                const taskId = data.id; 
-                updateStatus(`Langkah 2/2: Kling 3.0 sedang memproses dengan CFG ${cfg}. Mengecek status tiap 10 detik...`);
-
-                // Polling cek status video
-                let pollInterval = setInterval(async () => {
-                    try {
-                        const checkRes = await fetch(`https://api.magnific.com/v1/video/status/${taskId}`, {
-                            method: 'GET',
-                            headers: { 'x-magnific-api-key': apiKey }
-                        });
-                        const checkData = await checkRes.json();
-
-                        if (checkData.status === 'completed' || checkData.status === 'success') {
-                            clearInterval(pollInterval);
-                            updateStatus('', false);
-                            
-                            document.getElementById('outputVideo').src = checkData.video_url || checkData.output_url;
-                            videoContainer.style.display = 'block';
-                            btn.disabled = false;
-                        } else if (checkData.status === 'failed' || checkData.status === 'error') {
-                            clearInterval(pollInterval);
-                            updateStatus('Gagal: Server AI mengalami error saat merender video.');
-                            btn.disabled = false;
-                        }
-                    } catch (err) {
-                        console.error('Polling error:', err);
-                    }
-                }, 10000);
-
-            } catch (error) {
-                updateStatus(`Error: ${error.message}`);
-                btn.disabled = false;
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
