@@ -5,10 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIKINTIFIC - Image to Video</title>
     <style>
-        :root {
-            --bg-dark: #09090b; --card-bg: #121214; --card-border: #27272a;
-            --accent: #eab308; --text-main: #fafafa; --text-muted: #a1a1aa;
-        }
+        :root { --bg-dark: #09090b; --card-bg: #121214; --card-border: #27272a; --accent: #eab308; --text-main: #fafafa; --text-muted: #a1a1aa; }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; padding: 0; }
         .app-container { width: 100%; max-width: 500px; background: var(--bg-dark); min-height: 100vh; padding-bottom: 40px; }
@@ -73,9 +70,9 @@
 
     <div class="content">
         <div class="banner">
-            <div class="banner-badge">⭐ HEMAT KREDIT (55 KREDIT)</div>
-            <h2>KLING 2.6 I2V</h2>
-            <p>Ubah gambar statis menjadi video animasi memukau!</p>
+            <div class="banner-badge">⭐ HEMAT KREDIT MODE</div>
+            <h2>KLING ANIMATION</h2>
+            <p>Kode Mesin Resmi untuk Saldo Terbatas</p>
         </div>
 
         <div class="form-group" style="border-color: var(--accent);">
@@ -84,9 +81,11 @@
         </div>
 
         <div class="form-group">
-            <div class="form-header"><span>MODEL AI</span></div>
+            <div class="form-header"><span>KODE MESIN KLING</span></div>
             <select id="modelSelect">
-                <option value="kling-2.6" selected>Kling 2.6 (Tanpa Audio) - 55 Kredit</option>
+                <option value="kling" selected>Model: kling (Standar Paling Hemat)</option>
+                <option value="kling-v1.5">Model: kling-v1.5 (Versi 1.5 Standar)</option>
+                <option value="kling-v1">Model: kling-v1 (Versi 1.0 Lama)</option>
             </select>
         </div>
 
@@ -148,7 +147,6 @@
         const savedKey = localStorage.getItem('dikintific_api');
         if (savedKey) document.getElementById('apiKey').value = savedKey;
 
-        // Ambil data gambar secara real-time saat user memilih file
         document.getElementById('refImage').addEventListener('change', function(e) {
             const file = e.target.files[0];
             const textElement = document.getElementById('imgText');
@@ -242,7 +240,11 @@
             });
 
             const data = await response.json();
-            if (!response.ok) throw new Error(data.error || data.message || `Ditolak sistem.`);
+            if (!response.ok) {
+                // Perbaikan deteksi error agar lebih informatif
+                const errMsg = data.error || data.message || (data.msg ? data.msg : `Ditolak sistem.`);
+                throw new Error(errMsg);
+            }
 
             const taskId = data.id || (data.data && data.data.id) || data.task_id || (data.data && data.data.task_id); 
             
