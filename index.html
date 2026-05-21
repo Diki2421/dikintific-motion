@@ -181,7 +181,7 @@
         });
     }
 
-        async function generateVideo() {
+            async function generateVideo() {
         const apiKey = document.getElementById('apiKey').value;
         const model = document.getElementById('modelSelect').value;
         const imgFile = document.getElementById('refImage').files[0];
@@ -196,21 +196,17 @@
         localStorage.setItem('dikintific_api', apiKey);
         btn.disabled = true;
         btn.innerText = "Memproses...";
-        showStatus('Langkah 1: Menyiapkan data dan memutar jalur Proxy...', false);
+        showStatus('Langkah 1: Menyiapkan data ke server Vercel...', false);
 
         try {
             let base64Img = imgFile ? await fileToBase64(imgFile) : null;
             
-            // Trik bypass Firewall: Menggunakan public proxy
-            const targetUrl = 'https://api.magnific.com/v1/video/generate';
-            const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
-            
-            const response = await fetch(proxyUrl, {
+            // KITA KEMBALI MENGGUNAKAN SERVER VERCEL ANDA SENDIRI
+            const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     model: model,
@@ -220,7 +216,7 @@
                 })
             });
 
-            // Menangkap respons error jika masih diblokir
+            // Menangkap balasan dari server
             const rawText = await response.text();
             let data;
             try { 
@@ -229,7 +225,7 @@
                 data = { message: rawText }; 
             }
 
-            if (!response.ok) throw new Error(data.error || data.message || `Ditolak server. Status: ${response.status}`);
+            if (!response.ok) throw new Error(data.error || data.message || `Ditolak sistem. Status: ${response.status}`);
 
             showStatus('Berhasil! Video sedang diproses oleh AI.', false);
             btn.innerText = "Generate Video";
@@ -241,6 +237,7 @@
             btn.disabled = false;
         }
     }
+
 
 </script>
 </body>
