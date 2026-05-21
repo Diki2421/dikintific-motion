@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIKINTIFIC - Motion Control</title>
+    <title>DIKINTIFIC - Image to Video</title>
     <style>
         :root {
             --bg-dark: #09090b; --card-bg: #121214; --card-border: #27272a;
@@ -33,11 +33,6 @@
         .drop-text { font-size: 13px; color: var(--text-muted); }
         .file-hint { font-size: 11px; color: var(--accent); margin-top: 12px; text-align: center; }
 
-        .cfg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .range-wrap { display: flex; align-items: center; gap: 12px; }
-        input[type="range"] { flex-grow: 1; accent-color: var(--accent); height: 4px; background: var(--card-border); appearance: none; }
-        input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-        
         .btn-generate { width: 100%; padding: 16px; background: var(--accent); color: black; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
         .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -73,15 +68,15 @@
 <div class="app-container">
     <div class="header">
         <a href="#" class="back-btn">〈 Kembali</a>
-        <h1>MOTION CONTROL</h1>
+        <h1>IMAGE TO VIDEO</h1>
         <a href="#" class="menu-btn">👤 Menu</a>
     </div>
 
     <div class="content">
         <div class="banner">
-            <div class="banner-badge">⭐ HEMAT KREDIT MODE</div>
-            <h2>MOTION CONTROL</h2>
-            <p>Dilengkapi opsi Kling 2.6 dan setelan resolusi video.</p>
+            <div class="banner-badge">⭐ HEMAT KREDIT (55 KREDIT)</div>
+            <h2>KLING 2.6 I2V</h2>
+            <p>Ubah gambar statis menjadi video animasi memukau!</p>
         </div>
 
         <div class="form-group" style="border-color: var(--accent);">
@@ -92,22 +87,13 @@
         <div class="form-group">
             <div class="form-header"><span>MODEL AI</span></div>
             <select id="modelSelect">
-                <option value="kling-3.0/motion-control">Kling 3.0 Motion Control (Kredit Tinggi)</option>
-                <option value="kling-2.6/motion-control" selected>Kling 2.6 Pro Motion Control (Kredit Hemat)</option>
+                <option value="kling-2.6" selected>Kling 2.6 (Tanpa Audio - 5 Detik) - 55 Kredit</option>
+                <option value="kling-3.0">Kling 3.0 (Kualitas Tinggi) - Kredit Lebih Mahal</option>
             </select>
         </div>
 
         <div class="form-group">
-            <div class="form-header"><span>RESOLUSI VIDEO</span></div>
-            <select id="resSelect">
-                <option value="480p">480p (Paling Hemat Kredit)</option>
-                <option value="720p" selected>720p (Standar / Balance)</option>
-                <option value="1080p">1080p (Kualitas Tinggi)</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <div class="form-header"><span>GAMBAR REFERENSI</span><span>Wajib</span></div>
+            <div class="form-header"><span>FOTO REFERENSI</span><span>Wajib</span></div>
             <div class="drop-zone" id="imgDrop">
                 <div class="drop-icon">↑</div>
                 <div class="drop-text" id="imgText">Klik untuk buka galeri foto</div>
@@ -117,30 +103,11 @@
         </div>
 
         <div class="form-group">
-            <div class="form-header"><span>LINK VIDEO REFERENSI</span><span>Opsional</span></div>
-            <input type="text" id="refVideo" placeholder="Tempel URL Video di sini (Gunakan catbox.moe)">
-            <div class="file-hint">Pastikan link berakhiran .mp4</div>
-        </div>
-
-        <div class="form-group">
             <div class="form-header"><span>PROMPT</span><span style="text-transform:none;">Opsional</span></div>
-            <textarea id="promptInput" placeholder="Deskripsikan gaya gerakan video..."></textarea>
+            <textarea id="promptInput" placeholder="Contoh: The camera pans slowly, the person smiles warmly..."></textarea>
         </div>
 
-        <div class="form-group">
-            <div class="cfg-header">
-                <span class="form-header" style="margin:0;">CFG SCALE</span>
-                <span style="font-size: 11px; color: var(--text-muted);">0=bebas, 1=ketat</span>
-            </div>
-            <div class="range-wrap">
-                <span style="font-size: 12px; color: var(--text-muted);">0</span>
-                <input type="range" id="cfgScale" min="0" max="1" step="0.05" value="0.50" oninput="document.getElementById('cfgVal').innerText = parseFloat(this.value).toFixed(2)">
-                <span style="font-size: 12px; color: var(--text-muted);">1</span>
-                <span id="cfgVal" style="margin-left: 10px; font-weight:bold;">0.50</span>
-            </div>
-        </div>
-
-        <button class="btn-generate" id="btnAction" onclick="generateVideo()">Generate Video</button>
+        <button class="btn-generate" id="btnAction" onclick="generateVideo()">Animasikan Gambar!</button>
         
         <div id="statusBox" class="status-box status-error"></div>
 
@@ -176,9 +143,7 @@
 </div>
 
 <script>
-    let pollInterval;
-    let timerInterval;
-    let timeLeft = 180; 
+    let pollInterval, timerInterval, timeLeft = 180; 
 
     window.onload = () => {
         const savedKey = localStorage.getItem('dikintific_api');
@@ -252,11 +217,8 @@
     async function generateVideo() {
         const apiKey = document.getElementById('apiKey').value;
         const model = document.getElementById('modelSelect').value;
-        const resValue = document.getElementById('resSelect').value; // Mengambil nilai resolusi
         const imgFile = document.getElementById('refImage').files[0]; 
-        const vidUrl = document.getElementById('refVideo').value; 
         const prompt = document.getElementById('promptInput').value;
-        const cfg = document.getElementById('cfgScale').value;
         const btn = document.getElementById('btnAction');
         
         const loadingBox = document.getElementById('loadingContainer');
@@ -278,17 +240,13 @@
         try {
             let base64Img = await fileToBase64(imgFile);
 
-            // MENGIRIM PESANAN DENGAN TAMBAHAN PARAMETER RESOLUSI
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     model: model, 
                     prompt: prompt, 
-                    cfg_scale: parseFloat(cfg), 
-                    image_data: base64Img,
-                    video_url: vidUrl,
-                    resolution: resValue // Dikirim ke Vercel backend
+                    image_data: base64Img
                 })
             });
 
@@ -328,7 +286,7 @@
                                 
                                 const dlBtn = document.getElementById('downloadBtn');
                                 dlBtn.href = finalVideoUrl;
-                                dlBtn.download = "video_animasi.mp4";
+                                dlBtn.download = "kling_animation.mp4";
                                 dlBtn.target = "_blank";
 
                                 btn.style.display = 'block';
@@ -356,7 +314,7 @@
                     
                     const dlBtn = document.getElementById('downloadBtn');
                     dlBtn.href = instantUrl;
-                    dlBtn.download = "video_animasi.mp4";
+                    dlBtn.download = "kling_animation.mp4";
                     dlBtn.target = "_blank";
 
                     btn.style.display = 'block';
