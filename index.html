@@ -29,21 +29,27 @@
         .header p { font-size: 12px; color: var(--accent-color); margin-top: 4px; font-weight: bold; }
 
         .form-group { margin-bottom: 20px; }
-        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        label { display: flex; justify-content: space-between; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
         
-        input[type="text"], input[type="password"], textarea {
+        input[type="text"], input[type="password"], input[type="file"], textarea {
             width: 100%; padding: 12px; background: #1f1f1f;
             border: 1px solid var(--border-color); border-radius: 8px;
             color: #fff; font-size: 14px; transition: 0.3s;
         }
+        input[type="file"] { padding: 9px; cursor: pointer; color: var(--text-muted); }
         input:focus, textarea:focus { border-color: var(--accent-color); outline: none; }
-
+        
         textarea { height: 80px; resize: none; }
+
+        /* Slider CFG styling */
+        .cfg-container { display: flex; align-items: center; gap: 15px; }
+        input[type="range"] { flex-grow: 1; accent-color: var(--accent-color); }
+        .cfg-value { background: #262626; padding: 4px 10px; border-radius: 6px; font-size: 14px; font-weight: bold; }
 
         .btn-generate {
             width: 100%; padding: 14px; background: linear-gradient(90deg, #ca8a04, var(--accent-color));
             border: none; border-radius: 8px; color: #000; font-weight: bold;
-            font-size: 15px; cursor: pointer; transition: opacity 0.2s;
+            font-size: 15px; cursor: pointer; transition: opacity 0.2s; margin-top: 10px;
         }
         .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -66,18 +72,33 @@
         </div>
 
         <div class="form-group">
-            <label>MAGNIFIC API KEY</label>
+            <label>MAGNIFIC API KEY <span id="saveStatus" style="color:var(--accent-color); font-size:11px;">Tersimpan!</span></label>
             <input type="password" id="apiKey" placeholder="Masukkan API Key Magnific Anda">
         </div>
 
         <div class="form-group">
-            <label>URL REFERENSI (Wajib untuk Motion Control)</label>
-            <input type="text" id="refUrl" placeholder="Masukkan Link Gambar/Video sumber...">
+            <label>FILE REFERENSI (Upload Gambar/Video)</label>
+            <input type="file" id="refFile" accept="image/*,video/*">
+        </div>
+        
+        <div style="text-align: center; color: var(--text-muted); font-size: 12px; margin-bottom: 20px;">ATAU</div>
+
+        <div class="form-group">
+            <label>URL REFERENSI</label>
+            <input type="text" id="refUrl" placeholder="Masukkan Link URL jika tidak upload file...">
+        </div>
+
+        <div class="form-group">
+            <label>CFG SCALE (Seberapa patuh pada prompt)</label>
+            <div class="cfg-container">
+                <input type="range" id="cfgScale" min="1" max="15" step="0.5" value="5.5" oninput="document.getElementById('cfgVal').innerText = this.value">
+                <span class="cfg-value" id="cfgVal">5.5</span>
+            </div>
         </div>
 
         <div class="form-group">
             <label>PROMPT GERAKAN</label>
-            <textarea id="promptInput" placeholder="Contoh: A hyper-realistic woman in a fashion catalog outfit walking elegantly along Jalan Braga..."></textarea>
+            <textarea id="promptInput" placeholder="Contoh: A hyper-realistic woman walking elegantly along Jalan Braga..."></textarea>
         </div>
 
         <button class="btn-generate" id="btnAction" onclick="startGeneration()">GENERATE MOTION</button>
@@ -91,7 +112,26 @@
     </div>
 
     <script>
-        let pollInterval;
+        // Saat halaman dimuat, otomatis isi API Key jika pernah disimpan
+        window.onload = () => {
+            const savedKey = localStorage.getItem('dikintific_apikey');
+            if (savedKey) {
+                document.getElementById('apiKey').value = savedKey;
+                document.getElementById('saveStatus').style.display = 'inline';
+            } else {
+                document.getElementById('saveStatus').style.display = 'none';
+            }
+        };
+
+        // Fungsi mengubah file galeri HP menjadi format Base64 yang terbaca oleh API
+        function getBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
 
         function updateStatus(text, show = true) {
             const box = document.getElementById('statusBox');
@@ -101,49 +141,60 @@
 
         async function startGeneration() {
             const apiKey = document.getElementById('apiKey').value;
+            const refFile = document.getElementById('refFile').files[0];
             const refUrl = document.getElementById('refUrl').value;
             const prompt = document.getElementById('promptInput').value;
+            const cfg = document.getElementById('cfgScale').value;
             const btn = document.getElementById('btnAction');
             const videoContainer = document.getElementById('videoContainer');
 
-            if(!apiKey || !prompt || !refUrl) {
-                alert('Semua kolom (API Key, URL Referensi, dan Prompt) wajib diisi!');
-                return;
-            }
+            if(!apiKey) { alert('API Key wajib diisi!'); return; }
+            if(!refFile && !refUrl) { alert('Anda harus mengupload file ATAU memasukkan URL Referensi!'); return; }
+            if(!prompt) { alert('Prompt gerakan wajib diisi!'); return; }
+
+            // Simpan API Key ke memory browser HP (Local Storage)
+            localStorage.setItem('dikintific_apikey', apiKey);
+            document.getElementById('saveStatus').style.display = 'inline';
 
             btn.disabled = true;
             videoContainer.style.display = 'none';
-            updateStatus('Langkah 1/2: Mengirim request Kling 3.0 ke Magnific API...');
-
-            // URL Endpoint resmi untuk Magnific Video Generation
-            const baseApiUrl = 'https://api.magnific.com/v1/video/generate'; 
+            updateStatus('Langkah 1/2: Menyiapkan file dan mengirim request ke server...');
 
             try {
-                // Konfigurasi khusus untuk Magnific API & Kling 3.0 Motion
+                // Menentukan referensi (Utamakan file upload, jika kosong pakai URL)
+                let finalReferenceData = refUrl; 
+                if (refFile) {
+                    updateStatus('Memproses file dari HP Anda...');
+                    finalReferenceData = await getBase64(refFile);
+                }
+
+                const baseApiUrl = 'https://api.magnific.com/v1/video/generate'; 
+
                 const response = await fetch(baseApiUrl, {
                     method: 'POST',
                     headers: {
-                        'x-magnific-api-key': apiKey, // Header khusus Magnific
+                        'x-magnific-api-key': apiKey,
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         model: "kling-3.0-motion-control",
                         prompt: prompt,
-                        reference_image_url: refUrl 
+                        cfg_scale: parseFloat(cfg), // Mengirim nilai CFG Slider
+                        reference_data: finalReferenceData 
                     })
                 });
 
                 const data = await response.json();
 
                 if (!response.ok) {
-                    throw new Error(data.message || 'Gagal terhubung ke Magnific.');
+                    throw new Error(data.message || 'Gagal terhubung ke server.');
                 }
 
                 const taskId = data.id; 
-                updateStatus('Langkah 2/2: Kling 3.0 sedang memproses motion. Mengecek status tiap 10 detik...');
+                updateStatus(`Langkah 2/2: Kling 3.0 sedang memproses dengan CFG ${cfg}. Mengecek status tiap 10 detik...`);
 
-                // Polling untuk mengecek status video di Magnific
-                pollInterval = setInterval(async () => {
+                // Polling cek status video
+                let pollInterval = setInterval(async () => {
                     try {
                         const checkRes = await fetch(`https://api.magnific.com/v1/video/status/${taskId}`, {
                             method: 'GET',
@@ -160,7 +211,7 @@
                             btn.disabled = false;
                         } else if (checkData.status === 'failed' || checkData.status === 'error') {
                             clearInterval(pollInterval);
-                            updateStatus('Gagal: Server Magnific mengalami error saat memproses Kling.');
+                            updateStatus('Gagal: Server AI mengalami error saat merender video.');
                             btn.disabled = false;
                         }
                     } catch (err) {
