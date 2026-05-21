@@ -1,30 +1,31 @@
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Hanya menerima method POST' });
 
-    // Ambil API key dari header frontend
-    let apiKey = req.headers['authorization'];
-    if (!apiKey) return res.status(401).json({ error: 'API Key tidak ditemukan' });
-
     try {
         const response = await fetch('https://api.magnific.com/v1/video/generate', {
             method: 'POST',
             headers: {
-                'Authorization': apiKey, // Mengirim format Bearer yang sudah disiapkan frontend
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Authorization': req.headers['authorization'],
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(req.body)
         });
         
-        const data = await response.json();
+        // Alat Rontgen: Tangkap format balasan asli dari Magnific
+        const rawText = await response.text();
+        let data;
+        try { 
+            data = JSON.parse(rawText); 
+        } catch(e) { 
+            data = { message: rawText }; 
+        }
         
-        // Jika Magnific menolak
         if (!response.ok) {
-            return res.status(response.status).json({ error: data.message || data.error || 'Ditolak oleh Magnific (Pastikan saldo/akses tersedia)' });
+            return res.status(response.status).json({ error: `Ditolak Magnific (${response.status}): ${data.message || data.error || 'Cek saldo/akses'}` });
         }
 
         res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ error: 'Gagal terhubung ke jaringan server Magnific' });
+        res.status(500).json({ error: `Server Vercel Crash: ${error.message}` });
     }
 }
