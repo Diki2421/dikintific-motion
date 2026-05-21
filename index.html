@@ -181,7 +181,7 @@
         });
     }
 
-    async function generateVideo() {
+        async function generateVideo() {
         const apiKey = document.getElementById('apiKey').value;
         const model = document.getElementById('modelSelect').value;
         const imgFile = document.getElementById('refImage').files[0];
@@ -196,32 +196,40 @@
         localStorage.setItem('dikintific_api', apiKey);
         btn.disabled = true;
         btn.innerText = "Memproses...";
-        showStatus('Langkah 1: Menyiapkan data...', false);
+        showStatus('Langkah 1: Menyiapkan data dan memutar jalur Proxy...', false);
 
         try {
-            // Kita proses filenya (Untuk Vercel gratis, pastikan file kecil)
             let base64Img = imgFile ? await fileToBase64(imgFile) : null;
             
-            // PENTING: Karena ini melewati Vercel, kita tembak ke API lokal Vercel kita
-            const response = await fetch('/api/generate', {
+            // Trik bypass Firewall: Menggunakan public proxy
+            const targetUrl = 'https://api.magnific.com/v1/video/generate';
+            const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
+            
+            const response = await fetch(proxyUrl, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${apiKey}`, // Format Bearer yang benar
-                    'Content-Type': 'application/json'
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({
                     model: model,
                     prompt: prompt,
                     cfg_scale: parseFloat(cfg),
-                    image_data: base64Img,
-                    // Karena batasan Vercel 4.5MB, kita tidak kirim video base64 secara mentah ke sini 
-                    // kecuali ada proxy lanjutan. (Mockup request)
+                    image_data: base64Img
                 })
             });
 
-            const data = await response.json();
+            // Menangkap respons error jika masih diblokir
+            const rawText = await response.text();
+            let data;
+            try { 
+                data = JSON.parse(rawText); 
+            } catch(e) { 
+                data = { message: rawText }; 
+            }
 
-            if (!response.ok) throw new Error(data.error || data.message || 'Gagal otorisasi API.');
+            if (!response.ok) throw new Error(data.error || data.message || `Ditolak server. Status: ${response.status}`);
 
             showStatus('Berhasil! Video sedang diproses oleh AI.', false);
             btn.innerText = "Generate Video";
@@ -233,6 +241,7 @@
             btn.disabled = false;
         }
     }
+
 </script>
 </body>
 </html>
