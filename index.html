@@ -16,53 +16,67 @@
         
         .app-container { width: 100%; max-width: 500px; background: var(--bg-dark); min-height: 100vh; padding-bottom: 40px; }
         
-        /* Navbar / Header */
+        /* Navbar & Banner */
         .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--card-border); }
         .header h1 { font-size: 16px; font-weight: bold; letter-spacing: 2px; }
         .back-btn, .menu-btn { color: var(--text-muted); text-decoration: none; font-size: 14px; }
-        
         .content { padding: 20px; }
-
-        /* Banner */
         .banner { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800') center/cover; padding: 24px 20px; border-radius: 16px; border: 1px solid var(--accent); margin-bottom: 24px; }
         .banner-badge { background: rgba(234, 179, 8, 0.15); color: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; }
         .banner h2 { font-size: 22px; margin-bottom: 6px; }
         .banner p { font-size: 12px; color: var(--text-muted); }
 
-        /* Form Groups */
+        /* Form Controls */
         .form-group { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
-        .form-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 11px; font-weight: bold; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; }
-        
+        .form-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; }
         input[type="password"], select, textarea { width: 100%; background: transparent; border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; color: white; font-size: 14px; transition: 0.2s; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
         select { appearance: none; background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; }
-        
         textarea { height: 100px; resize: none; }
-
-        /* Drag & Drop Zones */
-        .drop-zone { border: 1px dashed var(--card-border); border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; }
-        .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: rgba(234, 179, 8, 0.05); }
+        .drop-zone { border: 1px dashed var(--card-border); border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; position: relative; }
         .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
         .drop-icon { font-size: 24px; color: var(--text-muted); margin-bottom: 8px; }
         .drop-text { font-size: 13px; color: var(--text-muted); }
         .file-hint { font-size: 11px; color: var(--accent); margin-top: 12px; text-align: center; }
 
-        /* Range Slider */
+        /* Slider */
         .cfg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-        .cfg-labels { font-size: 11px; color: var(--text-muted); }
         .range-wrap { display: flex; align-items: center; gap: 12px; }
-        input[type="range"] { flex-grow: 1; accent-color: var(--accent); height: 4px; background: var(--card-border); border-radius: 2px; appearance: none; }
+        input[type="range"] { flex-grow: 1; accent-color: var(--accent); height: 4px; background: var(--card-border); appearance: none; }
         input[type="range"]::-webkit-slider-thumb { appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; }
-        .cfg-value { font-size: 14px; font-weight: bold; }
-
-        /* Generate Button */
+        
         .btn-generate { width: 100%; padding: 16px; background: var(--accent); color: black; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-        .btn-generate:active { transform: scale(0.98); }
         .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .status-box { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px; text-align: center; display: none; }
-        .status-success { background: rgba(34, 197, 94, 0.1); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.2); }
         .status-error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
+
+        /* LOADING UI & PROGRESS TRACKER */
+        .loading-container { display: none; margin-top: 24px; padding: 24px; background: var(--card-bg); border: 1px solid var(--accent); border-radius: 16px; text-align: center; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(234, 179, 8, 0.2); border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .timer-text { font-size: 18px; font-weight: bold; color: var(--accent); margin-bottom: 8px; font-family: monospace; }
+        .status-detail { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+        
+        .progress-steps { display: flex; justify-content: space-between; position: relative; }
+        .progress-steps::before { content: ''; position: absolute; top: 12px; left: 10%; right: 10%; height: 2px; background: var(--card-border); z-index: 1; }
+        .step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 33%; gap: 8px; }
+        .step-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--text-muted); transition: 0.3s; }
+        .step-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; transition: 0.3s; }
+        
+        /* Active States for Steps */
+        .step.active .step-dot { border-color: var(--accent); background: var(--accent); color: black; box-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
+        .step.active .step-label { color: var(--accent); }
+        .step.done .step-dot { border-color: #4ade80; background: #4ade80; color: black; }
+        .step.done .step-label { color: #4ade80; }
+        .step.failed .step-dot { border-color: #f87171; background: #f87171; color: black; }
+        .step.failed .step-label { color: #f87171; }
+
+        /* Hasil Video */
+        .result-container { margin-top: 24px; padding: 16px; background: var(--card-bg); border: 1px solid #4ade80; border-radius: 16px; display: none; text-align: center; }
+        .result-container h3 { font-size: 14px; margin-bottom: 12px; color: #4ade80; }
+        video { width: 100%; border-radius: 8px; border: 1px solid var(--card-border); background: black; }
+        .btn-download { display: inline-block; margin-top: 12px; padding: 10px 20px; background: #fafafa; color: black; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: bold; transition: 0.2s; }
     </style>
 </head>
 <body>
@@ -82,8 +96,8 @@
         </div>
 
         <div class="form-group" style="border-color: var(--accent);">
-            <div class="form-header"><span>API KEY MAGNIFIC</span></div>
-            <input type="password" id="apiKey" placeholder="sk-xxxxxxxxxxxxxxxx" style="border-color: var(--accent);">
+            <div class="form-header"><span>API KEY</span></div>
+            <input type="password" id="apiKey" placeholder="Masukkan API Key Anda" style="border-color: var(--accent);">
         </div>
 
         <div class="form-group">
@@ -95,10 +109,7 @@
         </div>
 
         <div class="form-group">
-            <div class="form-header">
-                <span>GAMBAR REFERENSI</span>
-                <span>Wajib — maks 15 MB</span>
-            </div>
+            <div class="form-header"><span>GAMBAR REFERENSI</span><span>maks 15 MB</span></div>
             <div class="drop-zone" id="imgDrop">
                 <div class="drop-icon">↑</div>
                 <div class="drop-text" id="imgText">Klik atau drag gambar di sini</div>
@@ -107,51 +118,63 @@
         </div>
 
         <div class="form-group">
-            <div class="form-header">
-                <span>VIDEO REFERENSI</span>
-                <span>Wajib — maks 100 MB</span>
-            </div>
-            <div class="drop-zone" id="vidDrop">
-                <div class="drop-icon">↑</div>
-                <div class="drop-text" id="vidText">Klik atau drag video di sini</div>
-                <input type="file" id="refVideo" accept="video/*" onchange="updateFileName(this, 'vidText')">
-            </div>
-            <div class="file-hint">Gunakan video referensi dari TikTok agar ukurannya kecil</div>
-        </div>
-
-        <div class="form-group">
-            <div class="form-header"><span>PROMPT</span> <span style="text-transform:none;">Opsional</span></div>
+            <div class="form-header"><span>PROMPT</span><span style="text-transform:none;">Opsional</span></div>
             <textarea id="promptInput" placeholder="Deskripsikan video yang ingin dibuat..."></textarea>
-        </div>
-
-        <div class="form-group">
-            <div class="form-header"><span>CHARACTER ORIENTATION</span></div>
-            <select id="orientation">
-                <option value="video">Video (default)</option>
-                <option value="image">Image</option>
-            </select>
         </div>
 
         <div class="form-group">
             <div class="cfg-header">
                 <span class="form-header" style="margin:0;">CFG SCALE</span>
-                <span class="cfg-labels">0=bebas, 1=ketat</span>
+                <span style="font-size: 11px; color: var(--text-muted);">0=bebas, 1=ketat</span>
             </div>
             <div class="range-wrap">
                 <span style="font-size: 12px; color: var(--text-muted);">0</span>
                 <input type="range" id="cfgScale" min="0" max="1" step="0.05" value="0.50" oninput="document.getElementById('cfgVal').innerText = parseFloat(this.value).toFixed(2)">
                 <span style="font-size: 12px; color: var(--text-muted);">1</span>
-                <span class="cfg-value" id="cfgVal" style="margin-left: 10px;">0.50</span>
+                <span id="cfgVal" style="margin-left: 10px; font-weight:bold;">0.50</span>
             </div>
         </div>
 
         <button class="btn-generate" id="btnAction" onclick="generateVideo()">Generate Video</button>
         
-        <div id="statusBox" class="status-box"></div>
+        <div id="statusBox" class="status-box status-error"></div>
+
+        <div id="loadingContainer" class="loading-container">
+            <div class="spinner"></div>
+            <div class="timer-text" id="timerText">03:00</div>
+            <div class="status-detail" id="statusDetail">Menghubungkan ke server...</div>
+            
+            <div class="progress-steps">
+                <div class="step active" id="step1">
+                    <div class="step-dot">1</div>
+                    <div class="step-label">Mulai</div>
+                </div>
+                <div class="step" id="step2">
+                    <div class="step-dot">2</div>
+                    <div class="step-label">Proses AI</div>
+                </div>
+                <div class="step" id="step3">
+                    <div class="step-dot">3</div>
+                    <div class="step-label">Selesai</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="resultContainer" class="result-container">
+            <h3>✨ Video Berhasil Dibuat ✨</h3>
+            <video id="outputVideo" controls autoplay loop playsinline></video>
+            <br>
+            <a id="downloadBtn" href="#" download="motion_result.mp4" class="btn-download">⬇️ Download Video</a>
+        </div>
+
     </div>
 </div>
 
 <script>
+    let pollInterval;
+    let timerInterval;
+    let timeLeft = 180; // Estimasi 3 menit (180 detik)
+
     window.onload = () => {
         const savedKey = localStorage.getItem('dikintific_api');
         if (savedKey) document.getElementById('apiKey').value = savedKey;
@@ -164,14 +187,51 @@
         }
     }
 
-    function showStatus(msg, isError = false) {
+    function showError(msg) {
         const box = document.getElementById('statusBox');
         box.style.display = 'block';
-        box.className = 'status-box ' + (isError ? 'status-error' : 'status-success');
         box.innerText = msg;
     }
 
-    // Fungsi konversi file (Digunakan untuk gambar saja agar tidak crash)
+    function hideError() { document.getElementById('statusBox').style.display = 'none'; }
+
+    function updateStep(stepNum, status = 'active') {
+        document.getElementById('step1').className = 'step';
+        document.getElementById('step2').className = 'step';
+        document.getElementById('step3').className = 'step';
+
+        if(stepNum >= 1) document.getElementById('step1').className = 'step done';
+        if(stepNum >= 2) document.getElementById('step2').className = 'step done';
+        
+        if (status === 'failed') {
+            document.getElementById(`step${stepNum}`).className = 'step failed';
+            document.getElementById('step3').querySelector('.step-label').innerText = 'Gagal';
+        } else if (status === 'active') {
+            document.getElementById(`step${stepNum}`).className = 'step active';
+        } else if (status === 'done' && stepNum === 3) {
+            document.getElementById('step3').className = 'step done';
+            document.getElementById('step3').querySelector('.step-label').innerText = 'Sukses';
+        }
+    }
+
+    function startTimer() {
+        timeLeft = 180; 
+        document.getElementById('timerText').innerText = "03:00";
+        clearInterval(timerInterval);
+        
+        timerInterval = setInterval(() => {
+            timeLeft--;
+            if (timeLeft <= 0) {
+                document.getElementById('timerText').innerText = "Hampir Selesai...";
+                clearInterval(timerInterval);
+            } else {
+                let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+                let s = (timeLeft % 60).toString().padStart(2, '0');
+                document.getElementById('timerText').innerText = `${m}:${s}`;
+            }
+        }, 1000);
+    }
+
     function fileToBase64(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -181,64 +241,111 @@
         });
     }
 
-            async function generateVideo() {
+    async function generateVideo() {
         const apiKey = document.getElementById('apiKey').value;
         const model = document.getElementById('modelSelect').value;
         const imgFile = document.getElementById('refImage').files[0];
-        const vidFile = document.getElementById('refVideo').files[0];
         const prompt = document.getElementById('promptInput').value;
         const cfg = document.getElementById('cfgScale').value;
         const btn = document.getElementById('btnAction');
+        
+        const loadingBox = document.getElementById('loadingContainer');
+        const resultBox = document.getElementById('resultContainer');
 
-        if(!apiKey) return showStatus('API Key wajib diisi!', true);
-        if(!imgFile && !vidFile) return showStatus('Pilih minimal Gambar atau Video referensi!', true);
+        if(!apiKey) return showError('API Key wajib diisi!');
+        if(!imgFile) return showError('Pilih minimal Gambar referensi!');
 
+        hideError();
         localStorage.setItem('dikintific_api', apiKey);
-        btn.disabled = true;
-        btn.innerText = "Memproses...";
-        showStatus('Langkah 1: Menyiapkan data ke server Vercel...', false);
+        
+        // Setup UI untuk Loading
+        btn.style.display = 'none'; // Sembunyikan tombol Generate
+        resultBox.style.display = 'none';
+        loadingBox.style.display = 'block';
+        
+        // LANGKAH 1: MULAI
+        updateStep(1, 'active');
+        document.getElementById('statusDetail').innerText = 'Mengupload data ke server...';
 
         try {
             let base64Img = imgFile ? await fileToBase64(imgFile) : null;
             
-            // KITA KEMBALI MENGGUNAKAN SERVER VERCEL ANDA SENDIRI
             const response = await fetch('/api/generate', {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: model,
-                    prompt: prompt,
-                    cfg_scale: parseFloat(cfg),
-                    image_data: base64Img
-                })
+                headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ model: model, prompt: prompt, cfg_scale: parseFloat(cfg), image_data: base64Img })
             });
 
-            // Menangkap balasan dari server
             const rawText = await response.text();
             let data;
-            try { 
-                data = JSON.parse(rawText); 
-            } catch(e) { 
-                data = { message: rawText }; 
+            try { data = JSON.parse(rawText); } catch(e) { data = { message: rawText }; }
+
+            if (!response.ok) throw new Error(data.error || data.message || `Ditolak sistem.`);
+
+            // LANGKAH 2: PROSES AI
+            updateStep(2, 'active');
+            document.getElementById('statusDetail').innerText = 'AI sedang merender gerakan video...';
+            startTimer(); // Mulai hitung mundur 3 menit
+
+            const taskId = data.id || data.task_id; 
+            if (taskId) {
+                pollInterval = setInterval(async () => {
+                    try {
+                        const checkRes = await fetch(`https://api.kie.ai/api/v1/runway/status/${taskId}`, {
+                            headers: { 'Authorization': `Bearer ${apiKey}` }
+                        });
+                        const checkData = await checkRes.json();
+
+                        if (checkData.status === 'completed' || checkData.status === 'success' || checkData.video_url) {
+                            // LANGKAH 3: SELESAI (SUKSES)
+                            clearInterval(pollInterval);
+                            clearInterval(timerInterval);
+                            updateStep(3, 'done');
+                            
+                            setTimeout(() => {
+                                loadingBox.style.display = 'none';
+                                resultBox.style.display = 'block';
+                                document.getElementById('outputVideo').src = checkData.video_url || checkData.output_url;
+                                document.getElementById('downloadBtn').href = checkData.video_url || checkData.output_url;
+                                btn.style.display = 'block';
+                                btn.innerText = "Generate Video Lagi";
+                            }, 1000);
+                            
+                        } else if (checkData.status === 'failed') {
+                            // LANGKAH 3: SELESAI (GAGAL AI)
+                            clearInterval(pollInterval);
+                            clearInterval(timerInterval);
+                            updateStep(3, 'failed');
+                            document.getElementById('statusDetail').innerText = 'Server AI gagal memproses video ini.';
+                            setTimeout(() => { loadingBox.style.display = 'none'; btn.style.display = 'block'; showError('Gagal: AI error saat merender.'); }, 2000);
+                        }
+                    } catch (err) {
+                        console.error('Menunggu...', err);
+                    }
+                }, 10000); 
+            } else {
+                // Jika langsung beres tanpa taskId
+                clearInterval(timerInterval);
+                updateStep(3, 'done');
+                setTimeout(() => {
+                    loadingBox.style.display = 'none';
+                    resultBox.style.display = 'block';
+                    document.getElementById('outputVideo').src = data.video_url || data.output_url;
+                    btn.style.display = 'block';
+                }, 1000);
             }
 
-            if (!response.ok) throw new Error(data.error || data.message || `Ditolak sistem. Status: ${response.status}`);
-
-            showStatus('Berhasil! Video sedang diproses oleh AI.', false);
-            btn.innerText = "Generate Video";
-            btn.disabled = false;
-
         } catch (error) {
-            showStatus(`Error: ${error.message}`, true);
-            btn.innerText = "Generate Video";
-            btn.disabled = false;
+            // LANGKAH 3: SELESAI (GAGAL JARINGAN/API)
+            updateStep(3, 'failed');
+            document.getElementById('statusDetail').innerText = 'Terjadi kesalahan jaringan atau API Key.';
+            setTimeout(() => {
+                loadingBox.style.display = 'none';
+                btn.style.display = 'block';
+                showError(`Error: ${error.message}`);
+            }, 2000);
         }
     }
-
-
 </script>
 </body>
 </html>
