@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAKENIFIC - Motion Control</title>
+    <style>
+        :root {
+            --bg-color: #0d0d0d;
+            --card-bg: #141414;
+            --accent-color: #facc15;
+            --accent-hover: #eab308;
+            --text-main: #ffffff;
+            --text-muted: #a3a3a3;
+            --border-color: #262626;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .wrapper {
+            width: 100%;
+            max-width: 480px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .header { text-align: center; margin-bottom: 24px; }
+        .header h1 { font-size: 24px; color: var(--text-main); letter-spacing: 1px; }
+        .header p { font-size: 12px; color: var(--accent-color); margin-top: 4px; font-weight: bold; }
+
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+        
+        input[type="text"], input[type="password"], textarea {
+            width: 100%;
+            padding: 12px;
+            background: #1f1f1f;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        input:focus, textarea:focus {
+            border-color: var(--accent-color);
+            outline: none;
+        }
+
+        textarea { height: 80px; resize: none; }
+
+        .btn-generate {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, #ca8a04, var(--accent-color));
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .status-box {
+            margin-top: 20px;
+            padding: 12px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+            display: none;
+            font-size: 14px;
+        }
+
+        .video-container {
+            margin-top: 24px;
+            display: none;
+            text-align: center;
+        }
+        video {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(250,204,21,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <div class="header">
+            <h1>SAKENIFIC MOTION</h1>
+            <p>BUAT TANPA BATAS (ANTI TIMEOUT)</p>
+        </div>
+
+        <div class="form-group">
+            <label>API KEY (Disimpan lokal di browser HP Anda)</label>
+            <input type="password" id="apiKey" placeholder="Masukkan sk-xxxxxxxxxxxx">
+        </div>
+
+        <div class="form-group">
+            <label>PROMPT VIDEO / GERAKAN</label>
+            <textarea id="promptInput" placeholder="Contoh: Cinematic drone footage of a customized Kawasaki Ninja H2 racing in Bandung at night..."></textarea>
+        </div>
+
+        <button class="btn-generate" id="btnAction" onclick="startGeneration()">GENERATE VIDEO</button>
+
+        <div class="status-box" id="statusBox">Menghubungkan ke API...</div>
+
+        <div class="video-container" id="videoContainer">
+            <label>HASIL GENERATE VIDEO:</label>
+            <video id="outputVideo" controls autoplay loop></video>
+        </div>
+    </div>
+
+    <script>
+        let pollInterval;
+
+        function updateStatus(text, show = true) {
+            const box = document.getElementById('statusBox');
+            if(show) {
+                box.style.display = 'block';
+                box.innerText = text;
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        async function startGeneration() {
+            const apiKey = document.getElementById('apiKey').value;
+            const prompt = document.getElementById('promptInput').value;
+            const btn = document.getElementById('btnAction');
+            const videoContainer = document.getElementById('videoContainer');
+
+            if(!apiKey || !prompt) {
+                alert('API Key dan Prompt wajib diisi!');
+                return;
+            }
+
+            // Lock UI
+            btn.disabled = true;
+            videoContainer.style.display = 'none';
+            updateStatus('Langkah 1/2: Mengirim tugas ke Server AI...');
+
+            /* * CONFIGURATION NOTE:
+             * Contoh di bawah menggunakan struktur API standar industri (Luma AI / sejenisnya).
+             * Sesuaikan URL endpoint & payload sesuai dengan dokumentasi resmi AI yang Anda pakai.
+             */
+            const baseApiUrl = 'https://api.lumalabs.ai/v1/video'; 
+
+            try {
+                // 1. Kirim perintah Generate (Hanya memicu, respons instan < 2 detik)
+                const response = await fetch(baseApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${apiKey}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ prompt: prompt })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Gagal memicu generasi video.');
+                }
+
+                // Ambil ID Tugas dari response API
+                const taskId = data.id; 
+                updateStatus('Langkah 2/2: Video sedang diproses di server AI. Mengecek status tiap 10 detik...');
+
+                // 2. Sistem Polling (Cek berkala langsung dari HP ke Server AI)
+                pollInterval = setInterval(async () => {
+                    try {
+                        const checkRes = await fetch(`${baseApiUrl}/${taskId}`, {
+                            method: 'GET',
+                            headers: { 'Authorization': `Bearer ${apiKey}` }
+                        });
+                        const checkData = await checkRes.json();
+
+                        // Cek kondisi status (Sesuaikan dengan dokumentasi API: 'completed', 'success', dll)
+                        if (checkData.state === 'completed' || checkData.status === 'success') {
+                            clearInterval(pollInterval);
+                            updateStatus('', false); // sembunyikan status
+                            
+                            // Tampilkan Video (Sesuaikan key URL video hasil dari API Anda)
+                            const videoUrl = checkData.video.url || checkData.output_url;
+                            document.getElementById('outputVideo').src = videoUrl;
+                            videoContainer.style.display = 'block';
+                            btn.disabled = false;
+                        } else if (checkData.state === 'failed' || checkData.status === 'error') {
+                            clearInterval(pollInterval);
+                            updateStatus('Gagal: Server AI mengalami error saat me-render video.');
+                            btn.disabled = false;
+                        } else {
+                            // Jika masih 'processing' / 'queued', biarkan interval berjalan terus
+                            updateStatus('Video masih di-render oleh AI... Mohon tunggu (Jangan tutup halaman ini).');
+                        }
+                    } catch (err) {
+                        console.error('Error saat polling:', err);
+                    }
+                }, 10000); // Cek setiap 10 detik sekali
+
+            } catch (error) {
+                updateStatus(`Error: ${error.message}`);
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
+
