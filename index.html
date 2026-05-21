@@ -22,7 +22,7 @@
         
         .form-group { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
         .form-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; }
-        input[type="password"], input[type="text"], select, textarea { width: 100%; background: transparent; border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; color: white; font-size: 14px; transition: 0.2s; }
+        input[type="password"], select, textarea { width: 100%; background: transparent; border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; color: white; font-size: 14px; transition: 0.2s; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
         select { appearance: none; background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; }
         textarea { height: 100px; resize: none; }
@@ -34,8 +34,7 @@
         .file-hint { font-size: 11px; color: var(--accent); margin-top: 12px; text-align: center; }
 
         .btn-generate { width: 100%; padding: 16px; background: var(--accent); color: black; border: none; border-radius: 12px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-        .btn-generate:disabled { opacity: 0.5; cursor: not-allowed; }
-
+        
         .status-box { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px; text-align: center; display: none; }
         .status-error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
 
@@ -48,8 +47,8 @@
         .progress-steps { display: flex; justify-content: space-between; position: relative; }
         .progress-steps::before { content: ''; position: absolute; top: 12px; left: 10%; right: 10%; height: 2px; background: var(--card-border); z-index: 1; }
         .step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 33%; gap: 8px; }
-        .step-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--text-muted); transition: 0.3s; }
-        .step-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; transition: 0.3s; }
+        .step-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--text-muted); }
+        .step-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
         .step.active .step-dot { border-color: var(--accent); background: var(--accent); color: black; box-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
         .step.active .step-label { color: var(--accent); }
         .step.done .step-dot { border-color: #4ade80; background: #4ade80; color: black; }
@@ -60,7 +59,7 @@
         .result-container { margin-top: 24px; padding: 16px; background: var(--card-bg); border: 1px solid #4ade80; border-radius: 16px; display: none; text-align: center; }
         .result-container h3 { font-size: 14px; margin-bottom: 12px; color: #4ade80; }
         video { width: 100%; border-radius: 8px; border: 1px solid var(--card-border); background: black; }
-        .btn-download { display: inline-block; margin-top: 12px; padding: 10px 20px; background: #fafafa; color: black; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: bold; transition: 0.2s; }
+        .btn-download { display: inline-block; margin-top: 12px; padding: 10px 20px; background: #fafafa; color: black; text-decoration: none; border-radius: 8px; font-size: 14px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -87,8 +86,7 @@
         <div class="form-group">
             <div class="form-header"><span>MODEL AI</span></div>
             <select id="modelSelect">
-                <option value="kling-2.6" selected>Kling 2.6 (Tanpa Audio - 5 Detik) - 55 Kredit</option>
-                <option value="kling-3.0">Kling 3.0 (Kualitas Tinggi) - Kredit Lebih Mahal</option>
+                <option value="kling-2.6" selected>Kling 2.6 (Tanpa Audio) - 55 Kredit</option>
             </select>
         </div>
 
@@ -97,14 +95,14 @@
             <div class="drop-zone" id="imgDrop">
                 <div class="drop-icon">↑</div>
                 <div class="drop-text" id="imgText">Klik untuk buka galeri foto</div>
-                <input type="file" id="refImage" accept="image/*" onchange="updateFileName(this)">
+                <input type="file" id="refImage" accept="image/*">
             </div>
             <div class="file-hint">Maksimal ukuran 10MB agar proses lancar</div>
         </div>
 
         <div class="form-group">
-            <div class="form-header"><span>PROMPT</span><span style="text-transform:none;">Opsional</span></div>
-            <textarea id="promptInput" placeholder="Contoh: The camera pans slowly, the person smiles warmly..."></textarea>
+            <div class="form-header"><span>PROMPT</span><span>Opsional</span></div>
+            <textarea id="promptInput" placeholder="Contoh: The character blinks gently and smiles, realistic motion..."></textarea>
         </div>
 
         <button class="btn-generate" id="btnAction" onclick="generateVideo()">Animasikan Gambar!</button>
@@ -143,23 +141,33 @@
 </div>
 
 <script>
-    let pollInterval, timerInterval, timeLeft = 180; 
+    let pollInterval, timerInterval, timeLeft = 180;
+    let globalBase64 = "";
 
     window.onload = () => {
         const savedKey = localStorage.getItem('dikintific_api');
         if (savedKey) document.getElementById('apiKey').value = savedKey;
-    };
 
-    function updateFileName(input) {
-        const textElement = document.getElementById('imgText');
-        if (input.files && input.files[0]) {
-            textElement.innerText = input.files[0].name;
-            textElement.style.color = 'var(--accent)';
-        } else {
-            textElement.innerText = "Klik untuk buka galeri foto";
-            textElement.style.color = 'var(--text-muted)';
-        }
-    }
+        // Ambil data gambar secara real-time saat user memilih file
+        document.getElementById('refImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const textElement = document.getElementById('imgText');
+            if (file) {
+                textElement.innerText = file.name;
+                textElement.style.color = 'var(--accent)';
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    globalBase64 = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                textElement.innerText = "Klik untuk buka galeri foto";
+                textElement.style.color = 'var(--text-muted)';
+                globalBase64 = "";
+            }
+        });
+    };
 
     function showError(msg) {
         const box = document.getElementById('statusBox');
@@ -178,20 +186,16 @@
         
         if (status === 'failed') {
             document.getElementById(`step${stepNum}`).className = 'step failed';
-            document.getElementById('step3').querySelector('.step-label').innerText = 'Gagal';
         } else if (status === 'active') {
             document.getElementById(`step${stepNum}`).className = 'step active';
         } else if (status === 'done' && stepNum === 3) {
             document.getElementById('step3').className = 'step done';
-            document.getElementById('step3').querySelector('.step-label').innerText = 'Sukses';
         }
     }
 
     function startTimer() {
-        timeLeft = 180; 
-        document.getElementById('timerText').innerText = "03:00";
+        timeLeft = 180;
         clearInterval(timerInterval);
-        
         timerInterval = setInterval(() => {
             timeLeft--;
             if (timeLeft <= 0) {
@@ -205,27 +209,16 @@
         }, 1000);
     }
 
-    function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
-        });
-    }
-
     async function generateVideo() {
         const apiKey = document.getElementById('apiKey').value;
         const model = document.getElementById('modelSelect').value;
-        const imgFile = document.getElementById('refImage').files[0]; 
         const prompt = document.getElementById('promptInput').value;
         const btn = document.getElementById('btnAction');
-        
         const loadingBox = document.getElementById('loadingContainer');
         const resultBox = document.getElementById('resultContainer');
 
         if(!apiKey) return showError('API Key wajib diisi!');
-        if(!imgFile) return showError('Silakan pilih gambar dari galeri Anda!');
+        if(!globalBase64) return showError('Silakan pilih foto referensi terlebih dahulu!');
 
         hideError();
         localStorage.setItem('dikintific_api', apiKey);
@@ -235,32 +228,27 @@
         loadingBox.style.display = 'block';
         
         updateStep(1, 'active');
-        document.getElementById('statusDetail').innerText = 'Mengupload gambar ke Gudang Kie.ai...';
+        document.getElementById('statusDetail').innerText = 'Mengunggah foto ke server...';
 
         try {
-            let base64Img = await fileToBase64(imgFile);
-
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
                     model: model, 
                     prompt: prompt, 
-                    image_data: base64Img
+                    image_data: globalBase64
                 })
             });
 
-            const rawText = await response.text();
-            let data;
-            try { data = JSON.parse(rawText); } catch(e) { data = { message: rawText }; }
-
+            const data = await response.json();
             if (!response.ok) throw new Error(data.error || data.message || `Ditolak sistem.`);
 
             const taskId = data.id || (data.data && data.data.id) || data.task_id || (data.data && data.data.task_id); 
             
             if (taskId) {
                 updateStep(2, 'active');
-                document.getElementById('statusDetail').innerText = 'Berhasil! AI sedang merender video Anda...';
+                document.getElementById('statusDetail').innerText = 'Foto sukses diunggah! AI mulai merender animasi...';
                 startTimer();
 
                 pollInterval = setInterval(async () => {
@@ -269,7 +257,6 @@
                             headers: { 'Authorization': `Bearer ${apiKey}` }
                         });
                         const checkData = await checkRes.json();
-                        
                         const statusData = checkData.data || checkData;
                         const statusState = statusData.status || statusData.state;
                         const finalVideoUrl = statusData.video_url || statusData.output_url || statusData.result_url;
@@ -283,49 +270,28 @@
                                 loadingBox.style.display = 'none';
                                 resultBox.style.display = 'block';
                                 document.getElementById('outputVideo').src = finalVideoUrl;
-                                
-                                const dlBtn = document.getElementById('downloadBtn');
-                                dlBtn.href = finalVideoUrl;
-                                dlBtn.download = "kling_animation.mp4";
-                                dlBtn.target = "_blank";
-
+                                document.getElementById('downloadBtn').href = finalVideoUrl;
                                 btn.style.display = 'block';
-                                btn.innerText = "Buat Video Baru";
+                                btn.innerText = "Buat Animasi Baru";
                             }, 1000);
                             
                         } else if (statusState === -1 || statusState === 'FAILED' || statusState === 'failed' || statusState === 'error') {
                             clearInterval(pollInterval);
                             clearInterval(timerInterval);
                             updateStep(3, 'failed');
-                            document.getElementById('statusDetail').innerText = 'Mesin AI gagal memproses gambar ini.';
-                            setTimeout(() => { loadingBox.style.display = 'none'; btn.style.display = 'block'; showError('Gagal: ' + (statusData.fail_reason || 'AI error.')); }, 2000);
+                            document.getElementById('statusDetail').innerText = 'Gagal memproses video.';
+                            setTimeout(() => { loadingBox.style.display = 'none'; btn.style.display = 'block'; showError('AI Error: ' + (statusData.fail_reason || 'Proses gagal.')); }, 2000);
                         }
-                    } catch (err) { console.error('Menunggu server...', err); }
-                }, 10000); 
+                    } catch (err) { console.error('Menghubungkan...', err); }
+                }, 10000);
 
-            } else if (data.video_url || (data.data && data.data.video_url)) {
-                const instantUrl = data.video_url || data.data.video_url;
-                clearInterval(timerInterval);
-                updateStep(3, 'done');
-                setTimeout(() => {
-                    loadingBox.style.display = 'none';
-                    resultBox.style.display = 'block';
-                    document.getElementById('outputVideo').src = instantUrl;
-                    
-                    const dlBtn = document.getElementById('downloadBtn');
-                    dlBtn.href = instantUrl;
-                    dlBtn.download = "kling_animation.mp4";
-                    dlBtn.target = "_blank";
-
-                    btn.style.display = 'block';
-                }, 1000);
             } else {
-                throw new Error("Ditolak Kie.ai: " + JSON.stringify(data));
+                throw new Error("Respon server tidak valid.");
             }
 
         } catch (error) {
             updateStep(3, 'failed');
-            document.getElementById('statusDetail').innerText = 'Dibatalkan oleh sistem Kie.ai';
+            document.getElementById('statusDetail').innerText = 'Proses terhenti.';
             setTimeout(() => {
                 loadingBox.style.display = 'none';
                 btn.style.display = 'block';
