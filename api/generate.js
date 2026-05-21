@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     try {
         let finalImageUrl = req.body.image_url || ""; 
 
-        // Proses Upload Otomatis ke Gudang Kie.ai (Sempurna)
+        // Proses Upload Gambar ke Gudang Kie.ai (Tetap dipertahankan karena sudah sukses 100%)
         if (req.body.image_data) {
             const base64Data = req.body.image_data.split(',')[1];
             const buffer = Buffer.from(base64Data, 'base64');
@@ -35,14 +35,13 @@ export default async function handler(req, res) {
 
         const targetUrl = 'https://api.kie.ai/api/v1/jobs/createTask'; 
         
-        // Format Payload 100% Bersih dan Diterima Mesin AI
+        // FORMAT BARU: IMAGE-TO-VIDEO (Tanpa Video Referensi)
         const kiePayload = {
-            model: req.body.model || "kling-3.0/motion-control",
+            model: req.body.model || "kling-2.6", 
             input: {
-                prompt: req.body.prompt || "",
-                input_urls: [finalImageUrl], 
-                video_urls: req.body.video_url ? [req.body.video_url] : []
-                // Kita hapus parameter 480p paksaan agar server Kie.ai tidak crash
+                prompt: req.body.prompt || "Make the character alive with realistic and subtle motion",
+                image_url: finalImageUrl, 
+                duration: 5 // Memastikan durasi 5 detik (55 kredit)
             }
         };
 
