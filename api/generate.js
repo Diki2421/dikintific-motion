@@ -1,18 +1,50 @@
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Hanya menerima method POST' });
 
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) return res.status(401).json({ error: 'API Key tidak ditemukan' });
+
     try {
-        // 1. Endpoint resmi Kie.ai untuk Create Task
+        let finalImageUrl = req.body.image_url || ""; // Jika sudah pakai link manual
+
+        // LANGKAH 1: JIKA PENGGUNA MENGIRIM FILE DARI GALERI (Base64)
+        if (req.body.image_data) {
+            // Mengubah Base64 kembali menjadi bentuk file biner
+            const base64Data = req.body.image_data.split(',')[1];
+            const buffer = Buffer.from(base64Data, 'base64');
+            const blob = new Blob([buffer], { type: 'image/jpeg' });
+            
+            // Membuat paket untuk dikirim ke Gudang Kie.ai
+            const formData = new FormData();
+            formData.append('file', blob, 'referensi.jpg');
+            formData.append('uploadPath', 'images/dikintific');
+
+            // Menembak ke Gudang Kie.ai
+            const uploadRes = await fetch('https://kieai.redpandaai.co/api/file-stream-upload', {
+                method: 'POST',
+                headers: { 'Authorization': authHeader },
+                body: formData
+            });
+            const uploadData = await uploadRes.json();
+            
+            // Jika sukses masuk gudang, ambil link sementaranya
+            if(uploadData.success && uploadData.data && uploadData.data.downloadUrl) {
+                finalImageUrl = uploadData.data.downloadUrl;
+            } else {
+                throw new Error("Gagal mengupload gambar ke gudang Kie.ai.");
+            }
+        }
+
+        if (!finalImageUrl) throw new Error("Gambar referensi wajib ada.");
+
+        // LANGKAH 2: MEMBUAT PESANAN (Kirim Link ke Kling 3.0)
         const targetUrl = 'https://api.kie.ai/api/v1/jobs/createTask'; 
         
-        // 2. Menerjemahkan bahasa Web Anda menjadi bahasa Kie.ai
         const kiePayload = {
-            model: "kling-3.0/motion-control", // Nama model resmi
+            model: req.body.model || "kling-3.0/motion-control",
             input: {
                 prompt: req.body.prompt || "",
-                // Kie.ai mewajibkan array URL untuk gambar
-                input_urls: req.body.image_url ? [req.body.image_url] : [],
-                // Kie.ai mewajibkan array URL untuk video referensi
+                input_urls: [finalImageUrl], 
                 video_urls: req.body.video_url ? [req.body.video_url] : []
             }
         };
@@ -20,27 +52,18 @@ export default async function handler(req, res) {
         const response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
-                'Authorization': req.headers['authorization'],
+                'Authorization': authHeader,
                 'Content-Type': 'application/json',
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
             },
             body: JSON.stringify(kiePayload)
         });
         
-        const rawText = await response.text();
-        let data;
-        try { 
-            data = JSON.parse(rawText); 
-        } catch(e) { 
-            data = { message: rawText }; 
-        }
-        
-        if (!response.ok) {
-            return res.status(response.status).json({ error: `Ditolak Kie.ai (${response.status}): ${data.message || data.error || 'Akses ditolak'}` });
-        }
+        const data = await response.json();
+        if (!response.ok) return res.status(response.status).json({ error: data.message || 'Akses ditolak' });
 
         res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ error: `Server Vercel Crash: ${error.message}` });
+        res.status(500).json({ error: error.message || 'Server Vercel Crash' });
     }
 }
