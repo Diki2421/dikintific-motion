@@ -1,3 +1,7 @@
+export const config = {
+    api: { bodyParser: true }
+};
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Hanya menerima method POST' });
 
@@ -7,8 +11,8 @@ export default async function handler(req, res) {
     try {
         let finalImageUrl = req.body.image_url || ""; 
 
-        // Proses Upload Gambar ke Gudang Kie.ai (Tetap dipertahankan karena sudah sukses 100%)
-        if (req.body.image_data) {
+        // Sistem pembacaan gambar yang lebih aman dan fleksibel
+        if (req.body.image_data && req.body.image_data.includes(',')) {
             const base64Data = req.body.image_data.split(',')[1];
             const buffer = Buffer.from(base64Data, 'base64');
             const blob = new Blob([buffer], { type: 'image/jpeg' });
@@ -31,17 +35,16 @@ export default async function handler(req, res) {
             }
         }
 
-        if (!finalImageUrl) throw new Error("Gambar referensi wajib ada.");
+        if (!finalImageUrl) throw new Error("Gambar referensi wajib diunggah ulang.");
 
         const targetUrl = 'https://api.kie.ai/api/v1/jobs/createTask'; 
         
-        // FORMAT BARU: IMAGE-TO-VIDEO (Tanpa Video Referensi)
         const kiePayload = {
             model: req.body.model || "kling-2.6", 
             input: {
-                prompt: req.body.prompt || "Make the character alive with realistic and subtle motion",
-                image_url: finalImageUrl, 
-                duration: 5 // Memastikan durasi 5 detik (55 kredit)
+                prompt: req.body.prompt || "Make the character alive, realistic motion",
+                image_url: finalImageUrl,
+                duration: 5
             }
         };
 
@@ -56,10 +59,10 @@ export default async function handler(req, res) {
         });
         
         const data = await response.json();
-        if (!response.ok) return res.status(response.status).json({ error: data.message || 'Akses ditolak' });
+        if (!response.ok) return res.status(response.status).json({ error: data.message || 'Akses ditolak oleh Kie.ai' });
 
         res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ error: error.message || 'Server Vercel Crash' });
+        res.status(500).json({ error: error.message || 'Server Vercel mengalami kendala' });
     }
 }
