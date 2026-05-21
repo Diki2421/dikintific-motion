@@ -2,19 +2,29 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ error: 'Hanya menerima method POST' });
 
     try {
-        // 1. UBAH TARGET URL KE SERVER KIE.AI
-        // Catatan: Ini adalah contoh endpoint Kie.ai, pastikan URL ini 
-        // sesuai dengan model yang Anda pilih di buku panduan docs.kie.ai
-        const targetUrl = 'https://api.kie.ai/api/v1/runway/generate'; 
+        // 1. Endpoint resmi Kie.ai untuk Create Task
+        const targetUrl = 'https://api.kie.ai/api/v1/jobs/createTask'; 
         
+        // 2. Menerjemahkan bahasa Web Anda menjadi bahasa Kie.ai
+        const kiePayload = {
+            model: "kling-3.0/motion-control", // Nama model resmi
+            input: {
+                prompt: req.body.prompt || "",
+                // Kie.ai mewajibkan array URL untuk gambar
+                input_urls: req.body.image_url ? [req.body.image_url] : [],
+                // Kie.ai mewajibkan array URL untuk video referensi
+                video_urls: req.body.video_url ? [req.body.video_url] : []
+            }
+        };
+
         const response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
-                'Authorization': req.headers['authorization'], // Otomatis mengirim API Key Kie Anda
+                'Authorization': req.headers['authorization'],
                 'Content-Type': 'application/json',
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
             },
-            body: JSON.stringify(req.body)
+            body: JSON.stringify(kiePayload)
         });
         
         const rawText = await response.text();
