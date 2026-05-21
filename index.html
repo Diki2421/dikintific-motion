@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DIKINTIFIC - Motion Control (Kie.ai)</title>
+    <title>DIKINTIFIC - Motion Control</title>
     <style>
         :root {
             --bg-dark: #09090b; --card-bg: #121214; --card-border: #27272a;
@@ -13,29 +13,30 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; padding: 0; }
-        
         .app-container { width: 100%; max-width: 500px; background: var(--bg-dark); min-height: 100vh; padding-bottom: 40px; }
-        
-        /* Navbar & Banner */
         .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--card-border); }
         .header h1 { font-size: 16px; font-weight: bold; letter-spacing: 2px; }
         .back-btn, .menu-btn { color: var(--text-muted); text-decoration: none; font-size: 14px; }
         .content { padding: 20px; }
+        
         .banner { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800') center/cover; padding: 24px 20px; border-radius: 16px; border: 1px solid var(--accent); margin-bottom: 24px; }
         .banner-badge { background: rgba(234, 179, 8, 0.15); color: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; }
         .banner h2 { font-size: 22px; margin-bottom: 6px; }
-        .banner p { font-size: 12px; color: var(--text-muted); }
-
-        /* Form Controls */
+        
         .form-group { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; margin-bottom: 16px; }
         .form-header { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 11px; font-weight: bold; color: var(--text-muted); text-transform: uppercase; }
         input[type="password"], input[type="text"], select, textarea { width: 100%; background: transparent; border: 1px solid var(--card-border); border-radius: 8px; padding: 12px; color: white; font-size: 14px; transition: 0.2s; }
         input:focus, select:focus, textarea:focus { border-color: var(--accent); outline: none; }
         select { appearance: none; background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; }
         textarea { height: 100px; resize: none; }
-        .file-hint { font-size: 11px; color: var(--accent); margin-top: 8px; text-align: left; }
+        
+        /* Drag Drop Balik Lagi! */
+        .drop-zone { border: 1px dashed var(--card-border); border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; position: relative; }
+        .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+        .drop-icon { font-size: 24px; color: var(--text-muted); margin-bottom: 8px; }
+        .drop-text { font-size: 13px; color: var(--text-muted); }
+        .file-hint { font-size: 11px; color: var(--accent); margin-top: 12px; text-align: center; }
 
-        /* Slider */
         .cfg-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         .range-wrap { display: flex; align-items: center; gap: 12px; }
         input[type="range"] { flex-grow: 1; accent-color: var(--accent); height: 4px; background: var(--card-border); appearance: none; }
@@ -47,7 +48,6 @@
         .status-box { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px; text-align: center; display: none; }
         .status-error { background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.2); }
 
-        /* LOADING UI & PROGRESS TRACKER */
         .loading-container { display: none; margin-top: 24px; padding: 24px; background: var(--card-bg); border: 1px solid var(--accent); border-radius: 16px; text-align: center; }
         .spinner { width: 50px; height: 50px; border: 4px solid rgba(234, 179, 8, 0.2); border-top: 4px solid var(--accent); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 16px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -59,8 +59,6 @@
         .step { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; width: 33%; gap: 8px; }
         .step-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--bg-dark); border: 2px solid var(--card-border); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: var(--text-muted); transition: 0.3s; }
         .step-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; transition: 0.3s; }
-        
-        /* Active States for Steps */
         .step.active .step-dot { border-color: var(--accent); background: var(--accent); color: black; box-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
         .step.active .step-label { color: var(--accent); }
         .step.done .step-dot { border-color: #4ade80; background: #4ade80; color: black; }
@@ -68,7 +66,6 @@
         .step.failed .step-dot { border-color: #f87171; background: #f87171; color: black; }
         .step.failed .step-label { color: #f87171; }
 
-        /* Hasil Video */
         .result-container { margin-top: 24px; padding: 16px; background: var(--card-bg); border: 1px solid #4ade80; border-radius: 16px; display: none; text-align: center; }
         .result-container h3 { font-size: 14px; margin-bottom: 12px; color: #4ade80; }
         video { width: 100%; border-radius: 8px; border: 1px solid var(--card-border); background: black; }
@@ -88,12 +85,12 @@
         <div class="banner">
             <div class="banner-badge">⭐ KIE.AI INTEGRATION</div>
             <h2>MOTION CONTROL</h2>
-            <p>Sistem Upload URL Cloud - Anti Timeout & Anti Crash</p>
+            <p>Upload langsung dari Galeri! Powered by Kie.ai Cloud</p>
         </div>
 
         <div class="form-group" style="border-color: var(--accent);">
             <div class="form-header"><span>API KEY KIE.AI</span></div>
-            <input type="password" id="apiKey" placeholder="Masukkan API Key Kie.ai Anda" style="border-color: var(--accent);">
+            <input type="password" id="apiKey" placeholder="Masukkan API Key Anda" style="border-color: var(--accent);">
         </div>
 
         <div class="form-group">
@@ -104,9 +101,13 @@
         </div>
 
         <div class="form-group">
-            <div class="form-header"><span>LINK GAMBAR REFERENSI</span><span>Wajib</span></div>
-            <input type="text" id="refImage" placeholder="Tempel URL Gambar di sini...">
-            <div class="file-hint">Pastikan link berakhiran .jpg / .png (Bisa copy link dari Discord)</div>
+            <div class="form-header"><span>GAMBAR REFERENSI</span><span>Wajib</span></div>
+            <div class="drop-zone" id="imgDrop">
+                <div class="drop-icon">↑</div>
+                <div class="drop-text" id="imgText">Klik untuk buka galeri foto</div>
+                <input type="file" id="refImage" accept="image/*" onchange="updateFileName(this, 'imgText')">
+            </div>
+            <div class="file-hint">Maksimal ukuran 10MB agar proses lancar</div>
         </div>
 
         <div class="form-group">
@@ -145,7 +146,7 @@
             <div class="progress-steps">
                 <div class="step active" id="step1">
                     <div class="step-dot">1</div>
-                    <div class="step-label">Mulai</div>
+                    <div class="step-label">Upload</div>
                 </div>
                 <div class="step" id="step2">
                     <div class="step-dot">2</div>
@@ -178,12 +179,18 @@
         if (savedKey) document.getElementById('apiKey').value = savedKey;
     };
 
+    function updateFileName(input, textId) {
+        if (input.files && input.files[0]) {
+            document.getElementById(textId).innerText = input.files[0].name;
+            document.getElementById(textId).style.color = 'var(--accent)';
+        }
+    }
+
     function showError(msg) {
         const box = document.getElementById('statusBox');
         box.style.display = 'block';
         box.innerText = msg;
     }
-
     function hideError() { document.getElementById('statusBox').style.display = 'none'; }
 
     function updateStep(stepNum, status = 'active') {
@@ -223,11 +230,20 @@
         }, 1000);
     }
 
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
     async function generateVideo() {
         const apiKey = document.getElementById('apiKey').value;
         const model = document.getElementById('modelSelect').value;
-        const imgUrl = document.getElementById('refImage').value; // Mengambil text URL
-        const vidUrl = document.getElementById('refVideo').value; // Mengambil text URL
+        const imgFile = document.getElementById('refImage').files[0]; 
+        const vidUrl = document.getElementById('refVideo').value; 
         const prompt = document.getElementById('promptInput').value;
         const cfg = document.getElementById('cfgScale').value;
         const btn = document.getElementById('btnAction');
@@ -236,7 +252,7 @@
         const resultBox = document.getElementById('resultContainer');
 
         if(!apiKey) return showError('API Key wajib diisi!');
-        if(!imgUrl) return showError('Link Gambar Referensi wajib diisi!');
+        if(!imgFile) return showError('Silakan pilih gambar dari galeri Anda!');
 
         hideError();
         localStorage.setItem('dikintific_api', apiKey);
@@ -246,10 +262,11 @@
         loadingBox.style.display = 'block';
         
         updateStep(1, 'active');
-        document.getElementById('statusDetail').innerText = 'Mengirim perintah ke server Kie.ai...';
+        document.getElementById('statusDetail').innerText = 'Mengupload gambar ke Gudang Kie.ai...';
 
         try {
-            // Kita kirim data ke Vercel kita dengan format URL Mentah, bukan Base64 lagi.
+            let base64Img = await fileToBase64(imgFile);
+
             const response = await fetch('/api/generate', {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
@@ -257,7 +274,7 @@
                     model: model, 
                     prompt: prompt, 
                     cfg_scale: parseFloat(cfg), 
-                    image_url: imgUrl, 
+                    image_data: base64Img, // Kirim file untuk di-upload otomatis oleh backend
                     video_url: vidUrl 
                 })
             });
@@ -269,29 +286,24 @@
             if (!response.ok) throw new Error(data.error || data.message || `Ditolak sistem.`);
 
             updateStep(2, 'active');
-            document.getElementById('statusDetail').innerText = 'Kie.ai sedang merender gerakan video...';
+            document.getElementById('statusDetail').innerText = 'Berhasil! Kie.ai sedang merender video Anda...';
             startTimer();
 
-            // Sesuai sistem Kie.ai terbaru, ID Task biasanya ada di dalam 'data.id' atau 'id'
             const taskId = data.id || (data.data && data.data.id) || data.task_id; 
             
             if (taskId) {
                 pollInterval = setInterval(async () => {
                     try {
-                        // Polling menggunakan endpoint resmi Kie.ai: recordInfo
                         const checkRes = await fetch(`https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${taskId}`, {
                             headers: { 'Authorization': `Bearer ${apiKey}` }
                         });
                         const checkData = await checkRes.json();
                         
-                        // Menyesuaikan dengan format respon recordInfo dari Kie.ai
                         const statusData = checkData.data || checkData;
                         const statusState = statusData.status || statusData.state;
                         const finalVideoUrl = statusData.video_url || statusData.output_url || statusData.result_url;
 
-                        // Di Kie.ai, status berhasil biasanya 1, 'SUCCESS', atau 'completed'
                         if (statusState === 1 || statusState === 'SUCCESS' || statusState === 'completed' || finalVideoUrl) {
-                            
                             clearInterval(pollInterval);
                             clearInterval(timerInterval);
                             updateStep(3, 'done');
@@ -302,22 +314,19 @@
                                 document.getElementById('outputVideo').src = finalVideoUrl;
                                 document.getElementById('downloadBtn').href = finalVideoUrl;
                                 btn.style.display = 'block';
-                                btn.innerText = "Generate Video Lagi";
+                                btn.innerText = "Buat Video Baru";
                             }, 1000);
                             
                         } else if (statusState === -1 || statusState === 'FAILED' || statusState === 'failed' || statusState === 'error') {
                             clearInterval(pollInterval);
                             clearInterval(timerInterval);
                             updateStep(3, 'failed');
-                            document.getElementById('statusDetail').innerText = 'Server Kie.ai gagal memproses video (Cek URL Referensi).';
-                            setTimeout(() => { loadingBox.style.display = 'none'; btn.style.display = 'block'; showError('Gagal: ' + (statusData.fail_reason || 'AI error saat merender.')); }, 2000);
+                            document.getElementById('statusDetail').innerText = 'Mesin AI gagal memproses gambar ini.';
+                            setTimeout(() => { loadingBox.style.display = 'none'; btn.style.display = 'block'; showError('Gagal: ' + (statusData.fail_reason || 'AI error.')); }, 2000);
                         }
-                    } catch (err) {
-                        console.error('Menunggu server...', err);
-                    }
+                    } catch (err) { console.error('Menunggu server...', err); }
                 }, 10000); 
             } else {
-                // Berjaga-jaga jika AI langsung mengembalikan video tanpa delay
                 clearInterval(timerInterval);
                 updateStep(3, 'done');
                 setTimeout(() => {
@@ -330,7 +339,7 @@
 
         } catch (error) {
             updateStep(3, 'failed');
-            document.getElementById('statusDetail').innerText = 'Terjadi kesalahan jaringan atau API Key.';
+            document.getElementById('statusDetail').innerText = 'Terjadi kesalahan sistem atau API.';
             setTimeout(() => {
                 loadingBox.style.display = 'none';
                 btn.style.display = 'block';
