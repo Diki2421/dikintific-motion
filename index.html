@@ -7,18 +7,15 @@
     <style>
         :root {
             --bg-dark: #09090b; --card-bg: #121214; --card-border: #27272a;
-            --accent: #eab308; --accent-hover: #ca8a04; --text-main: #fafafa;
-            --text-muted: #a1a1aa;
+            --accent: #eab308; --text-main: #fafafa; --text-muted: #a1a1aa;
         }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
         body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; padding: 0; }
         .app-container { width: 100%; max-width: 500px; background: var(--bg-dark); min-height: 100vh; padding-bottom: 40px; }
         .header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--card-border); }
         .header h1 { font-size: 16px; font-weight: bold; letter-spacing: 2px; }
         .back-btn, .menu-btn { color: var(--text-muted); text-decoration: none; font-size: 14px; }
         .content { padding: 20px; }
-        
         .banner { background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=800') center/cover; padding: 24px 20px; border-radius: 16px; border: 1px solid var(--accent); margin-bottom: 24px; }
         .banner-badge { background: rgba(234, 179, 8, 0.15); color: var(--accent); padding: 4px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; margin-bottom: 8px; }
         .banner h2 { font-size: 22px; margin-bottom: 6px; }
@@ -30,7 +27,6 @@
         select { appearance: none; background: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center; }
         textarea { height: 100px; resize: none; }
         
-        /* Drag Drop Balik Lagi! */
         .drop-zone { border: 1px dashed var(--card-border); border-radius: 12px; padding: 30px 20px; text-align: center; cursor: pointer; position: relative; }
         .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
         .drop-icon { font-size: 24px; color: var(--text-muted); margin-bottom: 8px; }
@@ -163,7 +159,7 @@
             <h3>✨ Video Berhasil Dibuat ✨</h3>
             <video id="outputVideo" controls autoplay loop playsinline></video>
             <br>
-            <a id="downloadBtn" href="#" download="motion_result.mp4" class="btn-download">⬇️ Download Video</a>
+            <a id="downloadBtn" href="#" class="btn-download">⬇️ Download Video</a>
         </div>
 
     </div>
@@ -274,7 +270,7 @@
                     model: model, 
                     prompt: prompt, 
                     cfg_scale: parseFloat(cfg), 
-                    image_data: base64Img, // Kirim file untuk di-upload otomatis oleh backend
+                    image_data: base64Img,
                     video_url: vidUrl 
                 })
             });
@@ -285,13 +281,15 @@
 
             if (!response.ok) throw new Error(data.error || data.message || `Ditolak sistem.`);
 
-            updateStep(2, 'active');
-            document.getElementById('statusDetail').innerText = 'Berhasil! Kie.ai sedang merender video Anda...';
-            startTimer();
-
-            const taskId = data.id || (data.data && data.data.id) || data.task_id; 
+            // PERBAIKAN BUG: Cek ketat apakah ada ID Antrean dari Kie.ai
+            const taskId = data.id || (data.data && data.data.id) || data.task_id || (data.data && data.data.task_id); 
             
             if (taskId) {
+                // Jika sukses dapat antrean, mulai timer
+                updateStep(2, 'active');
+                document.getElementById('statusDetail').innerText = 'Berhasil! Kie.ai sedang merender video Anda...';
+                startTimer();
+
                 pollInterval = setInterval(async () => {
                     try {
                         const checkRes = await fetch(`https://api.kie.ai/api/v1/jobs/recordInfo?taskId=${taskId}`, {
@@ -312,7 +310,13 @@
                                 loadingBox.style.display = 'none';
                                 resultBox.style.display = 'block';
                                 document.getElementById('outputVideo').src = finalVideoUrl;
-                                document.getElementById('downloadBtn').href = finalVideoUrl;
+                                
+                                // Set link download asli
+                                const dlBtn = document.getElementById('downloadBtn');
+                                dlBtn.href = finalVideoUrl;
+                                dlBtn.download = "video_animasi.mp4";
+                                dlBtn.target = "_blank";
+
                                 btn.style.display = 'block';
                                 btn.innerText = "Buat Video Baru";
                             }, 1000);
@@ -326,27 +330,29 @@
                         }
                     } catch (err) { console.error('Menunggu server...', err); }
                 }, 10000); 
-            } else {
+
+            } else if (data.video_url || (data.data && data.data.video_url)) {
+                // Jika video memang ajaibnya langsung jadi 0 detik
+                const instantUrl = data.video_url || data.data.video_url;
                 clearInterval(timerInterval);
                 updateStep(3, 'done');
                 setTimeout(() => {
                     loadingBox.style.display = 'none';
                     resultBox.style.display = 'block';
-                    document.getElementById('outputVideo').src = data.video_url || (data.data && data.data.video_url);
+                    document.getElementById('outputVideo').src = instantUrl;
+                    
+                    const dlBtn = document.getElementById('downloadBtn');
+                    dlBtn.href = instantUrl;
+                    dlBtn.download = "video_animasi.mp4";
+                    dlBtn.target = "_blank";
+
                     btn.style.display = 'block';
                 }, 1000);
+            } else {
+                // JIKA ERROR DARI KIE.AI (Tidak ada ID dan tidak ada Video)
+                throw new Error("Ditolak Kie.ai: " + JSON.stringify(data));
             }
 
         } catch (error) {
             updateStep(3, 'failed');
-            document.getElementById('statusDetail').innerText = 'Terjadi kesalahan sistem atau API.';
-            setTimeout(() => {
-                loadingBox.style.display = 'none';
-                btn.style.display = 'block';
-                showError(`Error: ${error.message}`);
-            }, 2000);
-        }
-    }
-</script>
-</body>
-</html>
+            docume
