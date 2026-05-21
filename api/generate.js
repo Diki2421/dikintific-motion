@@ -5,21 +5,18 @@ export default async function handler(req, res) {
     if (!authHeader) return res.status(401).json({ error: 'API Key tidak ditemukan' });
 
     try {
-        let finalImageUrl = req.body.image_url || ""; // Jika sudah pakai link manual
+        let finalImageUrl = req.body.image_url || ""; 
 
-        // LANGKAH 1: JIKA PENGGUNA MENGIRIM FILE DARI GALERI (Base64)
+        // Proses Upload Otomatis ke Gudang Kie.ai
         if (req.body.image_data) {
-            // Mengubah Base64 kembali menjadi bentuk file biner
             const base64Data = req.body.image_data.split(',')[1];
             const buffer = Buffer.from(base64Data, 'base64');
             const blob = new Blob([buffer], { type: 'image/jpeg' });
             
-            // Membuat paket untuk dikirim ke Gudang Kie.ai
             const formData = new FormData();
             formData.append('file', blob, 'referensi.jpg');
             formData.append('uploadPath', 'images/dikintific');
 
-            // Menembak ke Gudang Kie.ai
             const uploadRes = await fetch('https://kieai.redpandaai.co/api/file-stream-upload', {
                 method: 'POST',
                 headers: { 'Authorization': authHeader },
@@ -27,7 +24,6 @@ export default async function handler(req, res) {
             });
             const uploadData = await uploadRes.json();
             
-            // Jika sukses masuk gudang, ambil link sementaranya
             if(uploadData.success && uploadData.data && uploadData.data.downloadUrl) {
                 finalImageUrl = uploadData.data.downloadUrl;
             } else {
@@ -37,15 +33,21 @@ export default async function handler(req, res) {
 
         if (!finalImageUrl) throw new Error("Gambar referensi wajib ada.");
 
-        // LANGKAH 2: MEMBUAT PESANAN (Kirim Link ke Kling 3.0)
         const targetUrl = 'https://api.kie.ai/api/v1/jobs/createTask'; 
         
+        // KITA KUNCI PAKSA DI LEVEL SERVER UNTUK VARIABEL TERHEMAT
         const kiePayload = {
-            model: req.body.model || "kling-3.0/motion-control",
+            model: "kling-2.6/motion-control", // Kunci paksa Kling 2.6
             input: {
                 prompt: req.body.prompt || "",
                 input_urls: [finalImageUrl], 
-                video_urls: req.body.video_url ? [req.body.video_url] : []
+                video_urls: req.body.video_url ? [req.body.video_url] : [],
+                
+                // Kita kirim semua jenis variasi kata kunci resolusi 
+                // biar server Kie.ai wajib membaca salah satunya!
+                mode: "480p",
+                resolution: "480p",
+                quality: "480p"
             }
         };
 
