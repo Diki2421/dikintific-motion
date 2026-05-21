@@ -11,7 +11,6 @@ export default async function handler(req, res) {
     try {
         let finalImageUrl = req.body.image_url || ""; 
 
-        // Sistem pembacaan gambar yang lebih aman dan fleksibel
         if (req.body.image_data && req.body.image_data.includes(',')) {
             const base64Data = req.body.image_data.split(',')[1];
             const buffer = Buffer.from(base64Data, 'base64');
@@ -35,12 +34,13 @@ export default async function handler(req, res) {
             }
         }
 
-        if (!finalImageUrl) throw new Error("Gambar referensi wajib diunggah ulang.");
+        if (!finalImageUrl) throw new Error("Gambar referensi wajib diunggah.");
 
         const targetUrl = 'https://api.kie.ai/api/v1/jobs/createTask'; 
         
+        // KITA KIRIM KODE MESIN YANG SESUAI PILIHAN DI WEB
         const kiePayload = {
-            model: req.body.model || "kling-2.6", 
+            model: req.body.model || "kling", 
             input: {
                 prompt: req.body.prompt || "Make the character alive, realistic motion",
                 image_url: finalImageUrl,
@@ -63,6 +63,6 @@ export default async function handler(req, res) {
 
         res.status(200).json(data);
     } catch (error) {
-        res.status(500).json({ error: error.message || 'Server Vercel mengalami kendala' });
+        res.status(500).json({ error: error.message || 'Server Vercel Crash' });
     }
 }
