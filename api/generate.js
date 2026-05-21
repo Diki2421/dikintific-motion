@@ -6,12 +6,14 @@ export default async function handler(req, res) {
             method: 'POST',
             headers: {
                 'Authorization': req.headers['authorization'],
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                /* INI TOPENGNYA (Mencegah blokir Firewall 403) */
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                'Accept': 'application/json, text/plain, */*'
             },
             body: JSON.stringify(req.body)
         });
         
-        // Alat Rontgen: Tangkap format balasan asli dari Magnific
         const rawText = await response.text();
         let data;
         try { 
@@ -21,7 +23,7 @@ export default async function handler(req, res) {
         }
         
         if (!response.ok) {
-            return res.status(response.status).json({ error: `Ditolak Magnific (${response.status}): ${data.message || data.error || 'Cek saldo/akses'}` });
+            return res.status(response.status).json({ error: `Ditolak Magnific (${response.status}): ${data.message || data.error || 'Akses ditolak'}` });
         }
 
         res.status(200).json(data);
