@@ -101,7 +101,7 @@
             <div class="drop-zone" id="imgDrop">
                 <div class="drop-icon">↑</div>
                 <div class="drop-text" id="imgText">Klik untuk buka galeri foto</div>
-                <input type="file" id="refImage" accept="image/*" onchange="updateFileName(this, 'imgText')">
+                <input type="file" id="refImage" accept="image/*" onchange="updateFileName(this)">
             </div>
             <div class="file-hint">Maksimal ukuran 10MB agar proses lancar</div>
         </div>
@@ -175,10 +175,15 @@
         if (savedKey) document.getElementById('apiKey').value = savedKey;
     };
 
-    function updateFileName(input, textId) {
+    // PERBAIKAN UTAMA: Perbaikan sistem pendeteksi nama file galeri
+    function updateFileName(input) {
+        const textElement = document.getElementById('imgText');
         if (input.files && input.files[0]) {
-            document.getElementById(textId).innerText = input.files[0].name;
-            document.getElementById(textId).style.color = 'var(--accent)';
+            textElement.innerText = input.files[0].name;
+            textElement.style.color = 'var(--accent)';
+        } else {
+            textElement.innerText = "Klik untuk buka galeri foto";
+            textElement.style.color = 'var(--text-muted)';
         }
     }
 
@@ -281,11 +286,9 @@
 
             if (!response.ok) throw new Error(data.error || data.message || `Ditolak sistem.`);
 
-            // PERBAIKAN BUG: Cek ketat apakah ada ID Antrean dari Kie.ai
             const taskId = data.id || (data.data && data.data.id) || data.task_id || (data.data && data.data.task_id); 
             
             if (taskId) {
-                // Jika sukses dapat antrean, mulai timer
                 updateStep(2, 'active');
                 document.getElementById('statusDetail').innerText = 'Berhasil! Kie.ai sedang merender video Anda...';
                 startTimer();
@@ -311,7 +314,6 @@
                                 resultBox.style.display = 'block';
                                 document.getElementById('outputVideo').src = finalVideoUrl;
                                 
-                                // Set link download asli
                                 const dlBtn = document.getElementById('downloadBtn');
                                 dlBtn.href = finalVideoUrl;
                                 dlBtn.download = "video_animasi.mp4";
@@ -332,7 +334,6 @@
                 }, 10000); 
 
             } else if (data.video_url || (data.data && data.data.video_url)) {
-                // Jika video memang ajaibnya langsung jadi 0 detik
                 const instantUrl = data.video_url || data.data.video_url;
                 clearInterval(timerInterval);
                 updateStep(3, 'done');
@@ -349,10 +350,19 @@
                     btn.style.display = 'block';
                 }, 1000);
             } else {
-                // JIKA ERROR DARI KIE.AI (Tidak ada ID dan tidak ada Video)
                 throw new Error("Ditolak Kie.ai: " + JSON.stringify(data));
             }
 
         } catch (error) {
             updateStep(3, 'failed');
-            docume
+            document.getElementById('statusDetail').innerText = 'Dibatalkan oleh sistem Kie.ai';
+            setTimeout(() => {
+                loadingBox.style.display = 'none';
+                btn.style.display = 'block';
+                showError(error.message);
+            }, 1000);
+        }
+    }
+</script>
+</body>
+</html>
